@@ -42,28 +42,26 @@ class Deck
         this.gameType = gameType
 
         // カードの配列
-        this.cards = [];
+        this.cards = this.gameType === "blackjack" ? Deck.initialCreateDeck() : [];
 
         // ゲームタイプによって、カードを初期化してください。
-        this.initialCreateDeck();
 
     }
     
-     initialCreateDeck(){
+    static initialCreateDeck(){
         const suits = ["H", "S", "D" ,"C"];
         const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
         let cards = [];
-        if(this.gameType === "blackjack"){
-            for(let i = 0;i < suits.length;i++){
-                for(let j = 0;j < ranks.length;i++){
-                    let card = new Card(suits[i], ranks[j]);
-                    cards.push(card);
-                }
-            }  
-            this.cards = cards;
+
+        for(let i = 0;i < suits.length;i++){
+            for(let j = 0;j < ranks.length;j++){
+                let card = new Card(suits[i], ranks[j]);
+                cards.push(card);
+            }
         }
         
+        return cards;
     }
 
     /*
@@ -75,8 +73,8 @@ class Deck
     {
         //TODO: ここから挙動をコードしてください。
         for(let i = 0;i < this.cards.length;i++){
-            let j = Math.floor(Math.ramdom * (i + 1));
-            let temp = this.card[i];
+            let j = Math.floor(Math.random() * (i + 1));
+            let temp = this.cards[i];
             this.cards[i] = this.cards[j];
             this.cards[j] = temp;
         }
@@ -108,12 +106,122 @@ class Deck
 }
 
 
-let deck = new Deck("blackjack");
+class Player
+{
+    /*
+        String name : プレイヤーの名前
+        String type : プレイヤータイプ。{'ai', 'user', 'house'}から選択。
+        String gameType : {'blackjack'}から選択。プレイヤーの初期化方法を決定するために使用されます。
+        ?Number chips : ゲーム開始に必要なチップ。デフォルトは400。
+    */
+    constructor(name, type, gameType, chips = 400)
+    {
+        // プレイヤーの名前
+        this.name = name;
 
-deck.shuffle();
+        // プレイヤーのタイプ
+        this.type = type;
 
-// console.log(deck.drawOne().getRankNumber());
-// console.log(deck.drawOne().getRankNumber());
-// console.log(deck.drawOne().getRankNumber());
-// console.log(deck.drawOne().getRankNumber());
-// console.log(deck.drawOne().getRankNumber());
+        // 現在のゲームタイプ
+        this.gameType = gameType;
+
+        // プレイヤーの手札
+        this.hand = [];
+
+        // プレイヤーが所持しているチップ。
+        this.chips = chips;
+
+        // 現在のラウンドでのベットしているチップ
+        this.bet = 0
+
+        // 勝利金額。正の数にも負の数にもなります。
+        this.winAmount = 0 
+
+        // プレイヤーのゲームの状態やアクションを表します。
+        // ブラックジャックの場合、最初の状態は「betting」です。
+        this.gameStatus = 'betting' 
+
+    }
+
+    /*
+       ?Number userData : モデル外から渡されるパラメータ。nullになることもあります。
+       return GameDecision : 状態を考慮した上で、プレイヤーが行った決定。
+
+        このメソッドは、どのようなベットやアクションを取るべきかというプレイヤーの決定を取得します。プレイヤーのタイプ、ハンド、チップの状態を読み取り、GameDecisionを返します。パラメータにuserData使うことによって、プレイヤーが「user」の場合、このメソッドにユーザーの情報を渡すことができますし、プレイヤーが 「ai」の場合、 userDataがデフォルトとしてnullを使います。
+    */
+    promptPlayer(userData)
+    {
+        //TODO: ここから挙動をコードしてください。
+        if(this.gameStatus === "betting"){
+            if(this.type === "ai")return this.getAiDecision();
+            else{
+                return new GameDecision("bet", userData);
+            }
+        }
+        else{
+            if(this.type === "ai")return this.getAiDecision();
+            else{
+                return new GameDecision(userData, this.bet);
+            }
+        }
+    }
+
+    /*
+       return Number : 手札の合計
+
+       合計が21を超える場合、手札の各エースについて、合計が21以下になるまで10を引きます。
+    */
+    getHandScore()
+    {
+        //TODO: ここから挙動をコードしてください。
+        let count = 0;
+        let aces = [];
+
+        for(let i = 0;i < this.hand.length;i++){
+            count += this.hand[i].getRankNumber();
+            if(this.hand[i].rank === "A")aces.push("A");
+        }
+
+        while(count > 21 && aces.length > 0){
+            aces.pop();
+            count -= 10;    
+        }
+        return count;
+    }
+
+    getAiDecision(){
+        if(this.gameStatus === "betting"){
+            return new GameDecision("bet", this.getIntegerRandom(0, this.chips));
+        }
+        else{
+            if(this.getHandScore() < 15){
+                return new GameDecision("hit", this.bet);
+            }
+            else{
+                return new GameDecision("stand", this.bet);
+            }
+        }
+    }
+
+    getIntegerRandom(min, max){
+        return Math.floor(Math.random() * (max + 1 -min)) + min;
+    }
+}
+
+class GameDecision
+{
+    /*
+       String action : プレイヤーのアクションの選択。（ブラックジャックでは、hit、standなど。）
+       Number amount : プレイヤーが選択する数値。
+
+       これはPlayer.promptPlayer()は常にreturnする、標準化されたフォーマットです。
+    */
+    constructor(action, amount)
+    {
+        // アクション
+        this.action = action
+        
+        // プレイヤーが選択する数値
+        this.amount = amount
+    }
+}
