@@ -1,67 +1,126 @@
 import { Card } from "./Card";
-export class Player{
-    private name: string;
-    private type: string;
-    private gameType: string;
-    private hand: Card[];
-    private chips: number;
-    private bet: number;
-    private winAmount: number;
-    private gameStatus: string;
+import { GameDecision } from "./GameDecision";
 
-    constructor(name: string, type: string, gameType: string, chips: number){
-        this.name = name;
-        this.type = type;
-        this.gameType = gameType;
-        this.chips = 400;
-        this.hand = [];
-        this.bet = 0;
-        this.winAmount = 0;
-        this.gameStatus = "betting";
+export class Player{
+    private _name: string;
+    private _type: string;
+    private _gameType: string;
+    private _hand: Card[];
+    private _chips: number;
+    private _bet: number;
+    private _winAmount: number;
+    private _gameStatus: string;
+
+    constructor(_name: string, _type: string, _gameType: string, _chips: number = 400){
+        this._name = _name;
+        this._type = _type;
+        this._gameType = _gameType;
+        this._chips = _chips;
+        this._hand = [];
+        this._bet = 0;
+        this._winAmount = 0;
+        this._gameStatus = "betting";
+    }
+
+    
+    public get get_name() : string {
+      return this._name
+    }
+    
+
+    
+    public get get_bet() : number {
+      return this._bet;
+    }
+
+    
+    public get get_winAmount() : number {
+      return this._winAmount;
     }
 
 
+    
+    public get get_gameStatus() : string {
+      return this._gameStatus;
+    }
+    
+    
+    
+ 
+    public set set_bet(amount : number) {
+      this._bet = amount;
+    }
+
+    
+    public set set_winAmount(amount : number) {
+      this._winAmount = amount;
+    }
+    
+    
+    public set set_gameStatus(status : string) {
+      this._gameStatus = status;
+    }
+    
+    
+
     public promptPlayer(userData: any): GameDecision{
 
-      if(this.type === "ai" || this.type === "house")return this.aiDecision;
-      if(this.gameStatus === "betting"){
+      if(this._type === "ai" || this._type === "house")return this.get_aiDecision;
+      if(this._gameStatus === "betting"){
         return new GameDecision("bet", userData);
       }
       else{
-        return new GameDecision(userData, this.bet);
+        return new GameDecision(userData, this._bet);
       }
     }
     
 
-    public get aiDecision(): GameDecision{
+    public get get_aiDecision(): GameDecision{
       const betDenominations: number[] = [5, 20, 50, 100];
       let betDenominationCount: number = Player.getRandomInteger(1, 4);
       let betIndex: number = Player.getRandomInteger(0, 3);
-      let bet: number = 0;
+      let _bet: number = 0;
 
-      if(this.gameStatus === "betting"){
+      if(this._gameStatus === "betting"){
         for(let i = betDenominationCount; i > 0;i--){
-          bet += betDenominations[betIndex];
+          _bet += betDenominations[betIndex];
         }
-        return new GameDecision("bet", bet);
+        return new GameDecision("bet", _bet);
       }
       else{
-        if(this.handScore < 15){
-          return new GameDecision("hit", this.bet);
+        if(this.get_handScore < 15){
+          return new GameDecision("hit", this._bet);
         }
         else{
-          return new GameDecision("stand", this.bet);
+          return new GameDecision("stand", this._bet);
         }
       }
     }
 
-    public get handScore(): number{
+    
+    public get get_hand() : Card[] {
+      return this._hand;
+    }
+
+    public set push_card(card : Card) { 
+      this._hand.push(card);
+    }
+
+    
+    public set reset_card(cards: Card[]){
+      this._hand = cards;
+    }
+    
+    
+    
+
+    public get get_handScore(): number{
       let count: number = 0;
       let aces: string[] = [];
 
-      for(let i = 0;i < this.hand.length;i++){
-        count += this.hand[i].rankNumber;
-        if(this.hand[i].rank === "A")aces.push("A");
+      for(let i = 0;i < this._hand.length;i++){
+        count += this._hand[i].get_rankNumber;
+        if(this._hand[i].rank === "A")aces.push("A");
       }
 
       while(count > 21 && aces.length > 0){
@@ -74,14 +133,6 @@ export class Player{
     private static getRandomInteger(min: number, max: number): number{
       return Math.floor(Math.random() * (max + 1 - min)) + min;
     }
+
 }
 
-class GameDecision{
-  private action: string;
-  private amount: number;
-
-  constructor(action: string, amount: number){
-    this.action = action;
-    this.amount = amount;
-  }
-}

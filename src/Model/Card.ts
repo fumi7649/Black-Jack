@@ -1,16 +1,27 @@
 export class Card{
 
-    readonly suit: string;
-    readonly rank: string;
+    private _suit: string;
+    private _rank: string;
 
-    constructor(suit: string, rank: string){
-        this.suit = suit;
-        this.rank = rank;
+    constructor(_suit: string, _rank: string){
+        this._suit = _suit;
+        this._rank = _rank;
     }
 
-    public get rankNumber(): number{
-      if(this.rank === "A")return 11;
-      else if(this.rank === "J" || this.rank === "Q" || this.rank === "K")return 10;
-      else return parseInt(this.rank);
+    
+    public get suit() : string {
+      return this.suit;
+    }
+    
+    public get rank() : string {
+      return this._rank;
+    }
+    
+    
+
+    public get get_rankNumber(): number{
+      if(this._rank === "A")return 11;
+      else if(this._rank === "J" || this._rank === "Q" || this._rank === "K")return 10;
+      else return parseInt(this._rank);
     }
 }
