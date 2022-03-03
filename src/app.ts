@@ -16,4 +16,5 @@ tableTest.set_player = player1;
 tableTest.set_player = player2;
 tableTest.set_player = player3;
 
+
 viewTest.renderTablePage(tableTest);

@@ -49,13 +49,16 @@ export class View {
                         </div>
                     </div><!-- houseEnd -->
                 </div> 
-                <div id="playersDiv" class="d-flex justify-content-between p-2">
+                <div id="playersDiv" class="d-flex justify-content-around p-2">
                     ${playersString}
                 </div>
             
                 `;
             if(table.get_gamePhase === "betting"){
                 this.target.innerHTML += this.getBetString();
+            }
+            else if(table.get_gamePhase === "acting"){
+                this.target.innerHTML += this.getActionString();
             }
             
         }
@@ -144,26 +147,38 @@ export class View {
 
         bet +=
             `
-            <div id="betDivs" class="d-flex w-50 my-2 m-auto">
-                <div class="input-group">
-                    <button class="btn btn-danger ">-</button>
-                    <input type="text" placeholder="0" class="input-number text-center" size="2">
-                    <button class="btn btn-success">+</button>
+            <div id="betDivs" class="d-flex justify-content-around w-50 my-2 m-auto">
+                <div>
+                    <p class="text-white text-center">5</p>
+                    <div class="input-group">
+                        <button class="btn btn-danger ">-</button>
+                        <input type="text" placeholder="0" class="input-number text-center" size="2">
+                        <button class="btn btn-success">+</button>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <button class="btn btn-danger">-</button>
-                    <input type="text" placeholder="0" class="input-number text-center" size="2">
-                    <button class="btn btn-success">+</button>
+                <div>
+                    <p class="text-white text-center">20</p>
+                    <div class="input-group">
+                        <button class="btn btn-danger">-</button>
+                        <input type="text" placeholder="0" class="input-number text-center" size="2">
+                        <button class="btn btn-success">+</button>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <button class="btn btn-danger">-</button>
-                    <input type="text" placeholder="0" class="input-number text-center" size="2">
-                    <button class="btn btn-success">+</button>
+                <div>
+                <p class="text-white text-center">50</p>
+                    <div class="input-group">
+                        <button class="btn btn-danger">-</button>
+                        <input type="text" placeholder="0" class="input-number text-center" size="2">
+                        <button class="btn btn-success">+</button>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <button class="btn btn-danger">-</button>
-                    <input type="text" placeholder="0" class="input-number text-center" size="2">
-                    <button class="btn btn-success">+</button>
+               <div>
+                    <p class="text-white text-center">100</p>
+                    <div class="input-group">
+                        <button class="btn btn-danger">-</button>
+                        <input type="text" placeholder="0" class="input-number text-center" size="2">
+                        <button class="btn btn-success">+</button>
+                    </div>
                 </div>
             </div>
             <div class="d-flex justify-content-center">
@@ -172,5 +187,22 @@ export class View {
             `
 
         return bet;
+    }
+
+    public getActionString(): string{
+        let actionString: string = ``;
+
+        actionString += 
+            `
+            <div id="playerAction">
+                <div class="d-flex justify-content-center p-2 py-5">
+                    <button class="col-2 col-lg-1 btn btn-light mx-1">Surrender</button>
+                    <button class="col-2 col-lg-1 btn btn-success mx-1">Stand</button>
+                    <button class="col-2 col-lg-1 btn btn-warning mx-1">Hit</button>
+                    <button class="col-2 col-lg-1 btn btn-danger mx-1">Double</button>
+                </div>
+            </div>
+            `
+        return actionString;
     }
 }
