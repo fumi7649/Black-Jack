@@ -10,7 +10,7 @@ export class Card{
 
     
     public get suit() : string {
-      return this.suit;
+      return this._suit;
     }
     
     public get rank() : string {

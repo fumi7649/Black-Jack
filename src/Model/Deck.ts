@@ -3,7 +3,7 @@ import { Card } from "./Card";
 export class Deck {
   private _gameType: string;
   private _cards: Card[] = [];
-  static readonly suits = ["H", "D", "C", "S"];
+  static readonly suits = ["heart", "diamond", "clover", "spade"];
   static readonly ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
   
 

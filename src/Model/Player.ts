@@ -26,6 +26,12 @@ export class Player{
     public get get_name() : string {
       return this._name
     }
+
+    
+    public get get_chips() : number {
+      return this._chips;
+    }
+    
     
 
     
@@ -42,6 +48,11 @@ export class Player{
     
     public get get_gameStatus() : string {
       return this._gameStatus;
+    }
+    
+    
+    public get type() : string {
+      return this._type;
     }
     
     

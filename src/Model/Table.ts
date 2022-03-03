@@ -24,12 +24,23 @@ export class Table{
   }
 
   
+  public get get_house() : Player {
+    return this._house;
+  }
+
+  
+  public get get_players() : Player[] {
+    return this._players;
+  }
+  
+  
+  
   public set set_gamePhase(gamePhase : string) {
     this._gamePhase = gamePhase;
   }
 
   
-  public set set_player(player : Player) {
+  public set set_player(player: Player) {
     this._players.push(player);
   }
 
