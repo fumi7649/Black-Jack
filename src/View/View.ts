@@ -34,33 +34,34 @@ export class View {
 
         if (this.target != null) {
             let playersString: string = ``;
-            
-            for(let player of table.get_players){
-                playersString += this.renderPlayer(player);
+
+            for (let player of table.get_players) {
+                playersString += this.getPlayerString(player);
             }
 
             this.target.innerHTML =
                 `
-            <div class="bg-green vh-100">
                 <div class="col-12">
                 <!-- house -->
                     <div id="house">
                         <div id="houseHands" class="d-flex justify-content-center">
-                         ${this.renderPlayer(table.get_house)}
+                         ${this.getPlayerString(table.get_house)}
                         </div>
                     </div><!-- houseEnd -->
                 </div> 
                 <div id="playersDiv" class="d-flex justify-content-between p-2">
                     ${playersString}
                 </div>
-            </div>
-                `
-
-
+            
+                `;
+            if(table.get_gamePhase === "betting"){
+                this.target.innerHTML += this.getBetString();
+            }
+            
         }
     }
 
-    public renderCard(card: Card): string {
+    public getCardString(card: Card): string {
         let cardString: string = ``;
         if (card === undefined) {
             cardString +=
@@ -91,14 +92,14 @@ export class View {
         return cardString;
     }
 
-    public renderPlayer(player: Player): string {
+    public getPlayerString(player: Player): string {
         let playerStatus: string = ``;
         let playerHands: string = ``;
         if (player.type === "house") {
-            playerHands += this.renderCard(player.get_hand[0]);
+            playerHands += this.getCardString(player.get_hand[0]);
         } else {
             for (let i = 0; i < 2; i++) {
-                playerHands += this.renderCard(player.get_hand[i]);
+                playerHands += this.getCardString(player.get_hand[i]);
             }
         }
         if (player.type === "house") {
@@ -134,6 +135,42 @@ export class View {
             </div>
             `;
         }
+
         return playerStatus;
+    }
+
+    public getBetString(): string {
+        let bet: string = ``;
+
+        bet +=
+            `
+            <div id="betDivs" class="d-flex w-50 my-2 m-auto">
+                <div class="input-group">
+                    <button class="btn btn-danger ">-</button>
+                    <input type="text" placeholder="0" class="input-number text-center" size="2">
+                    <button class="btn btn-success">+</button>
+                </div>
+                <div class="input-group">
+                    <button class="btn btn-danger">-</button>
+                    <input type="text" placeholder="0" class="input-number text-center" size="2">
+                    <button class="btn btn-success">+</button>
+                </div>
+                <div class="input-group">
+                    <button class="btn btn-danger">-</button>
+                    <input type="text" placeholder="0" class="input-number text-center" size="2">
+                    <button class="btn btn-success">+</button>
+                </div>
+                <div class="input-group">
+                    <button class="btn btn-danger">-</button>
+                    <input type="text" placeholder="0" class="input-number text-center" size="2">
+                    <button class="btn btn-success">+</button>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-success">Submit your bet</button>
+            </div>
+            `
+
+        return bet;
     }
 }
