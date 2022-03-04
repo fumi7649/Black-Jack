@@ -171,33 +171,33 @@ export class View {
                 <div>
                     <p class="text-white text-center">5</p>
                     <div class="input-group">
-                        <button class="btn btn-danger ">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
                 <div>
                     <p class="text-white text-center">20</p>
                     <div class="input-group">
-                        <button class="btn btn-danger">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
                 <div>
                 <p class="text-white text-center">50</p>
                     <div class="input-group">
-                        <button class="btn btn-danger">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
                <div>
                     <p class="text-white text-center">100</p>
                     <div class="input-group">
-                        <button class="btn btn-danger">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
             </div>

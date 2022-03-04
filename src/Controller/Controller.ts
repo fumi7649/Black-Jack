@@ -35,7 +35,37 @@ export class Controller{
           table.set_player = bot2;
         }
         view.renderTablePage(table);
+        Controller.addBetsEvent(table.get_players[0].get_chips);
        }
     })
+  }
+
+  public static addBetsEvent(chips: number): void{
+    const denominationBets = [5, 20, 50, 100];
+    let decreaseBets = document.querySelectorAll(".decreaseBets") as NodeListOf<HTMLButtonElement>;
+    let increaseBets = document.querySelectorAll(".increaseBets") as NodeListOf<HTMLButtonElement>;
+
+    let inputBets = document.querySelectorAll(".inputBets") as NodeListOf<HTMLInputElement>;
+
+    for(let i = 0;i < decreaseBets.length;i++){
+      Controller.addBetsEventHelper(inputBets[i], denominationBets[i], decreaseBets[i], chips);
+      Controller.addBetsEventHelper(inputBets[i], denominationBets[i], increaseBets[i], chips);
+    }
+  }
+
+  public static addBetsEventHelper(inputBets: HTMLInputElement, betAmount: number, betButton: HTMLButtonElement, chips: number): void{
+    if(betButton.innerHTML === "-"){
+      betButton.addEventListener("click", function(){
+        if(parseInt(inputBets.value) > 0){
+          inputBets.value = String(parseInt(inputBets.value) - betAmount);
+        }
+      })
+    }else if(betButton.innerHTML === "+"){
+      betButton.addEventListener("click", function(){
+        if(parseInt(inputBets.value) < chips){
+          inputBets.value = String(parseInt(inputBets.value) + betAmount);
+        }
+      })
+    }
   }
 }
