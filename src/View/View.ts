@@ -13,16 +13,16 @@ export class View {
         if (this.target !== null) {
             this.target.innerHTML =
                 `
-            <div id="initialPage">
+            <div id="landingPage">
                 <div class="bg-green vh-100 d-flex justify-content-center align-items-center flex-column">
-                    <h5 class="text-white">Welcom to Card Game!</h5>
+                    <h6 class="text-white">Welcom to Card Game!</h6>
                     <div class="form-group">
-                        <input type="text" placeholder="name" class="form-control">
-                        <select class="form-select">
+                        <input type="text" placeholder="name" class="form-control" id="inputName">
+                        <select class="form-select" id="selectGameType">
                             <option value="blackjack">Blackjack</option>
                             <option value="porker">Poker</option>
                         </select>
-                        <button class="btn btn-success form-control my-2">Start Game</button>
+                        <button class="btn btn-success form-control my-2" id="startGame">Start Game</button>
                     </div>
                 </div>
             </div>
@@ -33,10 +33,10 @@ export class View {
     public renderTablePage(table: Table): void {
 
         if (this.target != null) {
-            let playersString: string = ``;
-
-            for (let player of table.get_players) {
-                playersString += this.getPlayerString(player);
+            let botsString: string = ``;
+            this.target.innerHTML = "";
+            for (let i = 1; i < table.get_players.length;i++) {
+                botsString += this.getPlayerString(table.get_players[i]);
             }
 
             this.target.innerHTML =
@@ -48,9 +48,12 @@ export class View {
                          ${this.getPlayerString(table.get_house)}
                         </div>
                     </div><!-- houseEnd -->
+                    <div id="botsDiv" class="d-flex justify-content-around">
+                        ${botsString}
+                    </div>
                 </div> 
-                <div id="playersDiv" class="d-flex justify-content-around p-2">
-                    ${playersString}
+                <div id="userDiv" class="d-flex justify-content-center">
+                    ${this.getPlayerString(table.get_players[0])}
                 </div>
             
                 `;
@@ -69,7 +72,7 @@ export class View {
         if (card === undefined) {
             cardString +=
                 `
-            <div class="bg-white p-2 mx-2">
+            <div class="bg-white p-1 mx-2">
                       <div class="text-center">
                           <img src="./assets/img/questionMark.png" alt="" width="50" height="50">
                       </div>
@@ -109,8 +112,8 @@ export class View {
             playerStatus +=
                 `
             <div class="playerStatus">
-                  <div class="p-4">
-                      <h5 class="text-center text-white">${player.get_name}</h5>
+                  <div class="">
+                      <h6 class="text-center text-white pt-2">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -120,12 +123,29 @@ export class View {
                   </div> 
             </div>
             `;
-        } else {
+        } else if(player.type === "ai") {
             playerStatus +=
                 `
             <div class="playerStatus">
-                  <div class="p-4">
-                      <h5 class="text-center text-white">${player.get_name}</h5>
+                  <div class="">
+                      <h6 class="text-center text-white">${player.get_name}</h6>
+                  </div>
+                  <div id="player1Infomation" class="d-flex justify-content-around text-white ">
+                      <p>S: ${player.get_gameStatus}</p>
+                      <p>B: ${player.get_bet}</p>
+                      <p>C: ${player.get_chips}</p>
+                  </div>
+                  <div class="d-flex justify-content-center playerHands">
+                        ${playerHands}
+                  </div> 
+            </div>
+            `;
+        }else{
+            playerStatus +=
+                `
+            <div class="playerStatus">
+                  <div class="">
+                      <h6 class="text-center text-blue">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -181,7 +201,7 @@ export class View {
                     </div>
                 </div>
             </div>
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center p-1">
                 <button class="btn btn-success">Submit your bet</button>
             </div>
             `

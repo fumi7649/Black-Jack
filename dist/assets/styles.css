@@ -1,3 +1,10 @@
+p {
+  margin: 0;
+}
 .bg-green {
   background-color: #1D4434;
+}
+
+.text-blue{
+  color: #48D1CC;
 }
