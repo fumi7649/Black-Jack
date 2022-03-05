@@ -74,14 +74,14 @@ export class Player{
     
     
 
-    public promptPlayer(userData: any): GameDecision{
+    public promptPlayer(userData: string | number | null): GameDecision{
 
-      if(this._type === "ai" || this._type === "house")return this.get_aiDecision;
+      if(this._type === "ai" || this._type === "house" || userData === null)return this.get_aiDecision;
       if(this._gameStatus === "betting"){
-        return new GameDecision("bet", userData);
+        return new GameDecision("bet", userData as number);
       }
       else{
-        return new GameDecision(userData, this._bet);
+        return new GameDecision(userData as string, this._bet);
       }
     }
     

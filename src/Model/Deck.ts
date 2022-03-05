@@ -15,8 +15,8 @@ export class Deck {
 
   private static initialBlackJack(): Card[]{
     let _cards = [];
-    for(let suit in Deck.suits){
-        for(let rank in Deck.ranks){
+    for(let suit of Deck.suits){
+        for(let rank of Deck.ranks){
           let card = new Card(suit, rank);
           _cards.push(card);
         }

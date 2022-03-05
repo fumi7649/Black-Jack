@@ -1,28 +1,29 @@
+import { Controller } from "../Controller/Controller";
 import { Card } from "../Model/Card";
 import { Player } from "../Model/Player";
 import { Table } from "../Model/Table";
 
 export class View {
-    private target = document.getElementById("target");
+    private static target = document.getElementById("target");
 
     constructor() {
 
     }
 
-    public renderLandingPage(): void {
-        if (this.target !== null) {
-            this.target.innerHTML =
+    public static renderLandingPage(): void {
+        if (View.target !== null) {
+            View.target.innerHTML =
                 `
-            <div id="initialPage">
+            <div id="landingPage">
                 <div class="bg-green vh-100 d-flex justify-content-center align-items-center flex-column">
-                    <h5 class="text-white">Welcom to Card Game!</h5>
+                    <h6 class="text-white">Welcom to Card Game!</h6>
                     <div class="form-group">
-                        <input type="text" placeholder="name" class="form-control">
-                        <select class="form-select">
+                        <input type="text" placeholder="name" class="form-control" id="inputName">
+                        <select class="form-select" id="selectGameType">
                             <option value="blackjack">Blackjack</option>
                             <option value="porker">Poker</option>
                         </select>
-                        <button class="btn btn-success form-control my-2">Start Game</button>
+                        <button class="btn btn-success form-control my-2" id="startGame">Start Game</button>
                     </div>
                 </div>
             </div>
@@ -30,46 +31,69 @@ export class View {
         }
     }
 
-    public renderTablePage(table: Table): void {
+    public static renderTablePage(table: Table): void {
 
-        if (this.target != null) {
-            let playersString: string = ``;
-
-            for (let player of table.get_players) {
-                playersString += this.getPlayerString(player);
+        if (View.target != null) {
+            let botsString: string = ``;
+            View.target.innerHTML = "";
+            for (let i = 1; i < table.get_players.length;i++) {
+                botsString += View.getPlayerString(table.get_players[i]);
             }
 
-            this.target.innerHTML =
+            View.target.innerHTML =
                 `
                 <div class="col-12">
                 <!-- house -->
                     <div id="house">
                         <div id="houseHands" class="d-flex justify-content-center">
-                         ${this.getPlayerString(table.get_house)}
+                         ${View.getPlayerString(table.get_house)}
                         </div>
                     </div><!-- houseEnd -->
+                    <div id="botsDiv" class="d-flex justify-content-around">
+                        ${botsString}
+                    </div>
                 </div> 
-                <div id="playersDiv" class="d-flex justify-content-around p-2">
-                    ${playersString}
+                <div id="userDiv" class="d-flex justify-content-center">
+                    ${View.getPlayerString(table.get_players[0])}
                 </div>
             
                 `;
-            if(table.get_gamePhase === "betting"){
-                this.target.innerHTML += this.getBetString();
+            if(table.turnPlayer.type === "user"){
+                if(table.get_gamePhase === "betting" ){
+                    View.target.innerHTML += View.getBetString();
+                    Controller.addBetsEvent(table);
+                    Controller.addBetSubmitEvent(table);
+                }
+                else if(table.get_gamePhase === "acting"){
+                    View.target.innerHTML += View.getActionString();
+                    Controller.addActionEvent(table);
+                }
             }
-            else if(table.get_gamePhase === "acting"){
-                this.target.innerHTML += this.getActionString();
+            else{
+                if(table.get_gamePhase === "evaluateWinners"){
+                    console.log(table.get_gamePhase);
+                    View.target.innerHTML += 
+                        `
+                        ${View.getResultLogString}
+                        `
+                }
+                else{
+                setTimeout(function(){
+                    table.haveTurn(null);
+                    View.renderTablePage(table);
+                    console.log(table.get_gamePhase);
+                }, 1000);
+                }
             }
-            
         }
     }
 
-    public getCardString(card: Card): string {
+    public static getCardString(card: Card): string {
         let cardString: string = ``;
         if (card === undefined) {
             cardString +=
                 `
-            <div class="bg-white p-2 mx-2">
+            <div class="bg-white p-1 mx-2">
                       <div class="text-center">
                           <img src="./assets/img/questionMark.png" alt="" width="50" height="50">
                       </div>
@@ -95,22 +119,17 @@ export class View {
         return cardString;
     }
 
-    public getPlayerString(player: Player): string {
+    public static getPlayerString(player: Player): string {
         let playerStatus: string = ``;
         let playerHands: string = ``;
+        
         if (player.type === "house") {
-            playerHands += this.getCardString(player.get_hand[0]);
-        } else {
-            for (let i = 0; i < 2; i++) {
-                playerHands += this.getCardString(player.get_hand[i]);
-            }
-        }
-        if (player.type === "house") {
+            playerHands += View.getCardString(player.get_hand[0]);
             playerStatus +=
                 `
             <div class="playerStatus">
-                  <div class="p-4">
-                      <h5 class="text-center text-white">${player.get_name}</h5>
+                  <div class="">
+                      <h6 class="text-center text-white pt-2">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -120,12 +139,35 @@ export class View {
                   </div> 
             </div>
             `;
-        } else {
+        } else if(player.type === "ai") {
+            for (let i = 0; i < 2; i++) {
+                playerHands += View.getCardString(player.get_hand[i]);
+            }
             playerStatus +=
                 `
             <div class="playerStatus">
-                  <div class="p-4">
-                      <h5 class="text-center text-white">${player.get_name}</h5>
+                  <div class="">
+                      <h6 class="text-center text-white">${player.get_name}</h6>
+                  </div>
+                  <div id="player1Infomation" class="d-flex justify-content-around text-white ">
+                      <p>S: ${player.get_gameStatus}</p>
+                      <p>B: ${player.get_bet}</p>
+                      <p>C: ${player.get_chips}</p>
+                  </div>
+                  <div class="d-flex justify-content-center playerHands">
+                        ${playerHands}
+                  </div> 
+            </div>
+            `;
+        }else{
+            for (let i = 0; i < 2; i++) {
+                playerHands += View.getCardString(player.get_hand[i]);
+            }
+            playerStatus +=
+                `
+            <div class="playerStatus">
+                  <div class="">
+                      <h6 class="text-center text-blue">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -142,7 +184,7 @@ export class View {
         return playerStatus;
     }
 
-    public getBetString(): string {
+    public static getBetString(): string {
         let bet: string = ``;
 
         bet +=
@@ -151,58 +193,90 @@ export class View {
                 <div>
                     <p class="text-white text-center">5</p>
                     <div class="input-group">
-                        <button class="btn btn-danger ">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
                 <div>
                     <p class="text-white text-center">20</p>
                     <div class="input-group">
-                        <button class="btn btn-danger">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
                 <div>
                 <p class="text-white text-center">50</p>
                     <div class="input-group">
-                        <button class="btn btn-danger">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
                <div>
                     <p class="text-white text-center">100</p>
                     <div class="input-group">
-                        <button class="btn btn-danger">-</button>
-                        <input type="text" placeholder="0" class="input-number text-center" size="2">
-                        <button class="btn btn-success">+</button>
+                        <button class="btn btn-danger decreaseBets">-</button>
+                        <input type="text" value="0" class="input-number text-center inputBets" size="2">
+                        <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
             </div>
-            <div class="d-flex justify-content-center">
-                <button class="btn btn-success">Submit your bet</button>
+            <div class="d-flex justify-content-center p-1">
+                <button id="submitBetsButton" class="btn btn-success">Submit your bet</button>
             </div>
             `
 
         return bet;
     }
 
-    public getActionString(): string{
+    public static getActionString(): string{
         let actionString: string = ``;
 
         actionString += 
             `
             <div id="playerAction">
                 <div class="d-flex justify-content-center p-2 py-5">
-                    <button class="col-2 col-lg-1 btn btn-light mx-1">Surrender</button>
-                    <button class="col-2 col-lg-1 btn btn-success mx-1">Stand</button>
-                    <button class="col-2 col-lg-1 btn btn-warning mx-1">Hit</button>
-                    <button class="col-2 col-lg-1 btn btn-danger mx-1">Double</button>
+                    <button class="col-2 col-lg-1 btn btn-light mx-1 actionButton" value ="surrender">Surrender</button>
+                    <button class="col-2 col-lg-1 btn btn-success mx-1 actionButton" value="stand">Stand</button>
+                    <button class="col-2 col-lg-1 btn btn-warning mx-1 actionButton" value="hit">Hit</button>
+                    <button class="col-2 col-lg-1 btn btn-danger mx-1 actionButton" value="double">Double</button>
                 </div>
             </div>
             `
         return actionString;
     }
+
+    public static getResultLogString(table: Table): string{
+        let resultList: string = "";
+        for(let i = 0;i < table.get_resultLog.length;i++){
+            resultList += 
+                `
+                <li class="list-group-item">
+                    ${table.get_resultLog[i]}
+                </li>
+                `
+        }
+
+        let result: string = 
+        `
+        <div id="resultLog" class="d-flex justify-content-center align-items-center flex-column">
+            <div class="card">
+                <div class="card-header">
+                  round ${table.get_roundCounter}
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        ${resultList}
+                    </ul>
+                </div>
+              </div>
+        </div>
+        `;
+        
+        table.increase_roundCounter = 1;
+        return result;
+    }
+
 }
