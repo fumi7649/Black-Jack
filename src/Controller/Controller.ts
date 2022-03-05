@@ -4,18 +4,18 @@ import { Player } from "../Model/Player";
 import { View } from "../View/View";
 
 export class Controller{
-  private view: View;
+
+
   constructor(){
-    this.view = new View();
-    this.view.renderLandingPage();
+    View.renderLandingPage();
   }
 
   public startGame(): void{
     let inputName = document.querySelectorAll("#inputName")[0] as HTMLInputElement;
     let selectGameType = document.querySelectorAll("#selectGameType")[0] as HTMLSelectElement;
     let startGame = document.querySelectorAll("#startGame")[0];
-    let view: View = this.view;
     startGame.addEventListener("click", function(){
+
        if(inputName.value === ""){
           alert("名前を入力してください");
        }
@@ -34,22 +34,23 @@ export class Controller{
           table.set_player = bot1;
           table.set_player = bot2;
         }
-        view.renderTablePage(table);
-        Controller.addBetsEvent(table.get_players[0].get_chips);
+        View.renderTablePage(table);
        }
     })
   }
 
-  public static addBetsEvent(chips: number): void{
-    const denominationBets = [5, 20, 50, 100];
+  public static addBetsEvent(table: Table): void{
+    
     let decreaseBets = document.querySelectorAll(".decreaseBets") as NodeListOf<HTMLButtonElement>;
     let increaseBets = document.querySelectorAll(".increaseBets") as NodeListOf<HTMLButtonElement>;
-
     let inputBets = document.querySelectorAll(".inputBets") as NodeListOf<HTMLInputElement>;
+    
 
     for(let i = 0;i < decreaseBets.length;i++){
-      Controller.addBetsEventHelper(inputBets[i], denominationBets[i], decreaseBets[i], chips);
-      Controller.addBetsEventHelper(inputBets[i], denominationBets[i], increaseBets[i], chips);
+      Controller.addBetsEventHelper(inputBets[i], table.get_betDenomination[i], decreaseBets[i], table.turnPlayer.get_chips);
+    }
+    for(let i = 0; i < increaseBets.length;i ++){
+      Controller.addBetsEventHelper(inputBets[i], table.get_betDenomination[i], increaseBets[i], table.turnPlayer.get_chips);
     }
   }
 
@@ -58,14 +59,45 @@ export class Controller{
       betButton.addEventListener("click", function(){
         if(parseInt(inputBets.value) > 0){
           inputBets.value = String(parseInt(inputBets.value) - betAmount);
-        }
+        }      
       })
-    }else if(betButton.innerHTML === "+"){
+    }
+    else if(betButton.innerHTML === "+"){
       betButton.addEventListener("click", function(){
-        if(parseInt(inputBets.value) < chips){
+        if(parseInt(inputBets.value) < chips && Controller.totalBets() < chips){
           inputBets.value = String(parseInt(inputBets.value) + betAmount);
-        }
+        } 
       })
     }
   }
+
+  public static addBetSubmitEvent(table: Table): void{
+    let submitBetsButton = document.querySelectorAll("#submitBetsButton")[0];
+    submitBetsButton.addEventListener("click", function(){
+      let totalBets:number = Controller.totalBets();
+      table.haveTurn(totalBets); 
+      View.renderTablePage(table);
+    })
+  }
+
+  public static addActionEvent(table: Table): void{
+     let actionButton = document.querySelectorAll(".actionButton") as NodeListOf<HTMLButtonElement>;
+
+     for(let i = 0;i < actionButton.length;i++){
+       actionButton[i].addEventListener("click", function(){
+         table.haveTurn(actionButton[i].value);
+         View.renderTablePage(table);
+       })
+     }
+  }
+
+  public static totalBets(): number{
+    let totalBets:number = 0;
+    let inputBets = document.querySelectorAll(".inputBets") as NodeListOf<HTMLInputElement>;
+    for(let i = 0;i < inputBets.length;i++){
+      totalBets += parseInt(inputBets[i].value);
+    }
+    return totalBets;
+  }
+  
 }
