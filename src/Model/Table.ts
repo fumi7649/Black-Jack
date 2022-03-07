@@ -22,7 +22,7 @@ export class Table {
     this._house = new Player('house', 'house', this._gameType);
     this._resultLog = [];
     this._turnCounter = 0;
-    this._roundConuter = 1;
+    this._roundConuter = 0;
   }
 
 
@@ -126,11 +126,14 @@ export class Table {
       if (currentPlayer.get_gameStatus === "bust" || currentPlayer.get_gameStatus === "surrender") {
         s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|\n`;
       }
-      if (this._house.get_gameStatus === "blackjack" && currentPlayer.get_gameStatus === "blackjack") {
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|\n`;
+      else if (this._house.get_gameStatus === "blackjack" && currentPlayer.get_gameStatus === "blackjack") {
+        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|\n`;
       }
-      if (currentPlayer.get_gameStatus === "blackjack") {
+      else if (currentPlayer.get_gameStatus === "blackjack") {
         s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount * 1.5}|\n`;
+      }
+      else if(this._house.get_gameStatus === "bust" && !(currentPlayer.get_gameStatus === "surrender" || currentPlayer.get_gameStatus === "bust")){
+        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|\n`;
       }
       else {
         if (this._house.get_handScore < currentPlayer.get_handScore) {
@@ -188,16 +191,14 @@ export class Table {
       if(this.onLastPlayer()){
         this.set_gamePhase = "acting";
         this.increase_turnCounter = 1;
+        this.blackjackAssignPlayerHands();
+        this._house.set_gameStatus = "WaitingForActions";
         return;
       }
     }
     if (this._gamePhase === "acting") {
-      if(this.onFirstPlayer() && currentPlayer.get_gameStatus === "bet"){
-        this._house.set_gameStatus = "WaitingForActions";
-        this.blackjackAssignPlayerHands();
-      }
       this.evaluateMove(currentPlayer, userData);
-      if(this.onLastPlayer() && this.allPlayerActionsResolved())this.set_gamePhase = "evaluateWinners";
+      if(this.allPlayerActionsResolved())this.set_gamePhase = "evaluateWinners";
     }
     if(this._gamePhase === "evaluateWinners"){
       this.evaluateMove(this._house, null);

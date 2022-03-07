@@ -66,8 +66,8 @@ export class View {
                 }
                 else if (table.get_gamePhase === "acting") {
                     if (table.playerActionsResolved(table.turnPlayer)){
-                        console.log(table.playerActionsResolved(table.turnPlayer));
-                        table.increase_turnCounter = 1;
+                       table.haveTurn(null);
+                       View.renderTablePage(table);
                     }
                     else {
                         View.target.innerHTML += View.getActionString();
@@ -80,7 +80,7 @@ export class View {
                 }
                 else if (table.get_gamePhase === "roundOver") {
                     View.target.innerHTML += View.getResultLogString(table);
-                    View.target.innerHTML += View.getNextGameButtonStirng(table);
+                    Controller.addOKEvent(table);
                 }
             }
             else {
@@ -266,7 +266,7 @@ export class View {
 
     public static getResultLogString(table: Table): string {
         let resultList: string = "";
-        for (let i = 0; i < table.get_resultLog.length; i++) {
+        for (let i = 0;i < table.get_resultLog.length; i++) {
             resultList +=
                 `
                 <li class="list-group-item">
@@ -277,18 +277,21 @@ export class View {
 
         let result: string =
             `
-        <div id="resultLog" class="d-flex justify-content-center align-items-center flex-column">
-            <div class="card">
-                <div class="card-header">
-                  round ${table.get_roundCounter}
+            <div id="roundResults" class="position-absolute top-50 start-50 translate-middle-x w-50">
+                <div class="card text-center max-">
+                    <div class="card-header">
+                    round ${table.get_roundCounter + 1}
+                    </div>
+                    <div class="card-body">
+                        <div class="overflow-auto" style="max-height: 150px;">
+                            <ul class="list-group list-group-flush">
+                                ${resultList}
+                            </ul>                        
+                        </div>
+                        <a id="okResults" class="card-link">OK</a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        ${resultList}
-                    </ul>
-                </div>
-              </div>
-        </div>
+            </div>
         `;
 
         table.increase_roundCounter = 1;

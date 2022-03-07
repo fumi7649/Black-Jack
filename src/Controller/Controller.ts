@@ -85,10 +85,23 @@ export class Controller{
 
      for(let i = 0;i < actionButton.length;i++){
        actionButton[i].addEventListener("click", function(){
+         console.log(table.turnPlayer);
          table.haveTurn(actionButton[i].value);
          View.renderTablePage(table);
        })
      }
+  }
+
+  public static addOKEvent(table: Table): void{
+    let roundResults = document.querySelectorAll("#roundResults")[0];
+    let okResults = document.querySelectorAll("#okResults")[0];
+    
+    okResults.addEventListener("click", function(){
+        roundResults.innerHTML = 
+            `
+            ${View.getNextGameButtonStirng(table)}
+            `
+     })
   }
 
   public static totalBets(): number{
