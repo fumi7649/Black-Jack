@@ -19,10 +19,18 @@ let player3: Player = new Player("ai2", "ai", "blackjack");
 // tableTest.set_player = player2;
 // tableTest.set_player = player3;
 
-// let gameDecision: GameDecision = player2.promptPlayer(null);
 
-// console.log(gameDecision.get_action);
-// console.log(gameDecision.get_amount);
+// console.log(tableTest.turnPlayer);
+// console.log(tableTest.onLastPlayer());
+// tableTest.increase_turnCounter = 1;
+// console.log(tableTest.turnPlayer);
+// console.log(tableTest.onLastPlayer());
+// tableTest.increase_turnCounter = 1;
+// console.log(tableTest.turnPlayer);
+// console.log(tableTest.onLastPlayer());
+// tableTest.increase_turnCounter = 1;
+
+
 
 // View.renderTablePage(tableTest);
 

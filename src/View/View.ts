@@ -36,7 +36,7 @@ export class View {
         if (View.target != null) {
             let botsString: string = ``;
             View.target.innerHTML = "";
-            for (let i = 1; i < table.get_players.length;i++) {
+            for (let i = 1; i < table.get_players.length; i++) {
                 botsString += View.getPlayerString(table.get_players[i]);
             }
 
@@ -58,32 +58,36 @@ export class View {
                 </div>
             
                 `;
-            if(table.turnPlayer.type === "user"){
-                if(table.get_gamePhase === "betting" ){
+            if (table.turnPlayer.type === "user") {
+                if (table.get_gamePhase === "betting") {
                     View.target.innerHTML += View.getBetString();
                     Controller.addBetsEvent(table);
                     Controller.addBetSubmitEvent(table);
                 }
-                else if(table.get_gamePhase === "acting"){
-                    View.target.innerHTML += View.getActionString();
-                    Controller.addActionEvent(table);
+                else if (table.get_gamePhase === "acting") {
+                    if (table.playerActionsResolved(table.turnPlayer)){
+                        console.log(table.playerActionsResolved(table.turnPlayer));
+                        table.increase_turnCounter = 1;
+                    }
+                    else {
+                        View.target.innerHTML += View.getActionString();
+                        Controller.addActionEvent(table);
+                    }
                 }
-            }
-            else{
-                if(table.get_gamePhase === "evaluateWinners"){
-                    console.log(table.get_gamePhase);
-                    View.target.innerHTML += 
-                        `
-                        ${View.getResultLogString}
-                        `
-                }
-                else{
-                setTimeout(function(){
+                else if (table.get_gamePhase === "evaluateWinners") {
                     table.haveTurn(null);
                     View.renderTablePage(table);
-                    console.log(table.get_gamePhase);
-                }, 1000);
                 }
+                else if (table.get_gamePhase === "roundOver") {
+                    View.target.innerHTML += View.getResultLogString(table);
+                    View.target.innerHTML += View.getNextGameButtonStirng(table);
+                }
+            }
+            else {
+                setTimeout(function () {
+                    table.haveTurn(null);
+                    View.renderTablePage(table);
+                }, 1000);
             }
         }
     }
@@ -122,8 +126,9 @@ export class View {
     public static getPlayerString(player: Player): string {
         let playerStatus: string = ``;
         let playerHands: string = ``;
-        
-        if (player.type === "house") {
+        let len: number = 0;
+
+        if (player.type === "house" && (player.get_gameStatus === "WaitingForBets" || player.get_gameStatus === "WaitingForActions")) {
             playerHands += View.getCardString(player.get_hand[0]);
             playerStatus +=
                 `
@@ -139,8 +144,39 @@ export class View {
                   </div> 
             </div>
             `;
-        } else if(player.type === "ai") {
-            for (let i = 0; i < 2; i++) {
+        } else if (player.type === "house") {
+            if (player.get_hand.length > 0) {
+                len = player.get_hand.length;
+            }
+            else {
+                len = 2
+            }
+            for (let i = 0; i < len; i++) {
+                playerHands += View.getCardString(player.get_hand[i]);
+            }
+            playerStatus +=
+                `
+            <div class="playerStatus">
+                  <div class="">
+                      <h6 class="text-center text-white pt-2">${player.get_name}</h6>
+                  </div>
+                  <div id="player1Infomation" class="d-flex justify-content-around text-white ">
+                      <p>S: ${player.get_gameStatus}</p>
+                  </div>
+                  <div class="d-flex justify-content-center playerHands">
+                        ${playerHands}
+                  </div> 
+            </div>
+            `;
+        }
+        else {
+            if (player.get_hand.length > 0) {
+                len = player.get_hand.length;
+            }
+            else {
+                len = 2
+            }
+            for (let i = 0; i < len; i++) {
                 playerHands += View.getCardString(player.get_hand[i]);
             }
             playerStatus +=
@@ -148,26 +184,6 @@ export class View {
             <div class="playerStatus">
                   <div class="">
                       <h6 class="text-center text-white">${player.get_name}</h6>
-                  </div>
-                  <div id="player1Infomation" class="d-flex justify-content-around text-white ">
-                      <p>S: ${player.get_gameStatus}</p>
-                      <p>B: ${player.get_bet}</p>
-                      <p>C: ${player.get_chips}</p>
-                  </div>
-                  <div class="d-flex justify-content-center playerHands">
-                        ${playerHands}
-                  </div> 
-            </div>
-            `;
-        }else{
-            for (let i = 0; i < 2; i++) {
-                playerHands += View.getCardString(player.get_hand[i]);
-            }
-            playerStatus +=
-                `
-            <div class="playerStatus">
-                  <div class="">
-                      <h6 class="text-center text-blue">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -231,10 +247,10 @@ export class View {
         return bet;
     }
 
-    public static getActionString(): string{
+    public static getActionString(): string {
         let actionString: string = ``;
 
-        actionString += 
+        actionString +=
             `
             <div id="playerAction">
                 <div class="d-flex justify-content-center p-2 py-5">
@@ -248,10 +264,10 @@ export class View {
         return actionString;
     }
 
-    public static getResultLogString(table: Table): string{
+    public static getResultLogString(table: Table): string {
         let resultList: string = "";
-        for(let i = 0;i < table.get_resultLog.length;i++){
-            resultList += 
+        for (let i = 0; i < table.get_resultLog.length; i++) {
+            resultList +=
                 `
                 <li class="list-group-item">
                     ${table.get_resultLog[i]}
@@ -259,8 +275,8 @@ export class View {
                 `
         }
 
-        let result: string = 
-        `
+        let result: string =
+            `
         <div id="resultLog" class="d-flex justify-content-center align-items-center flex-column">
             <div class="card">
                 <div class="card-header">
@@ -274,9 +290,45 @@ export class View {
               </div>
         </div>
         `;
-        
+
         table.increase_roundCounter = 1;
         return result;
     }
 
+    public static getNextGameButtonStirng(table: Table): string {
+        let nextButton: string = "";
+        if (table.get_players[0].get_gameStatus === "broke") {
+            nextButton =
+                `
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Game Over</h5>
+                            <div class="p-2">
+                                <button id="stopGame" class="btn btn-danger">Stop Game</button>
+                                <button id="nextGameButton" class="btn btn-success">New Game</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+        }else{
+            nextButton =
+                `
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Do you want to continue the game?</h5>
+                            <div class="d-flex justify-content-around p-2">
+                                <button id="stopGame" class="btn btn-danger">Stop Game</button>
+                                <button id="nextGameButton" class="btn btn-primary">Next Game</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+        }
+
+        return nextButton;
+    }
 }
