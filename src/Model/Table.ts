@@ -205,7 +205,9 @@ export class Table {
       if(this.playerActionsResolved(this._house))this.set_gamePhase = "roundOver";
     }
     if(this._gamePhase === "roundOver"){
-      this.blackjackEvaluateAndGetRoundResults();
+      if(this.get_resultLog[this._roundConuter] === undefined){
+        this.blackjackEvaluateAndGetRoundResults();
+      }
       if(this._players[0].get_chips < 0)this._players[0].set_gameStatus = "broke";
     }
     this.increase_turnCounter = 1;
