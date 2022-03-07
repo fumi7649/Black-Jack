@@ -19,7 +19,7 @@ export class Player{
         this._hand = [];
         this._bet = 0;
         this._winAmount = 0;
-        this._gameStatus = "betting";
+        this._gameStatus = this.type === "house" ? "WaitingForBets" : "betting";
     }
 
     
@@ -90,13 +90,13 @@ export class Player{
       const betDenominations: number[] = [5, 20, 50, 100];
       let betDenominationCount: number = Player.getRandomInteger(1, 4);
       let betIndex: number = Player.getRandomInteger(0, 3);
-      let _bet: number = 0;
+      let bet: number = 0;
 
       if(this._gameStatus === "betting"){
         for(let i = betDenominationCount; i > 0;i--){
-          _bet += betDenominations[betIndex];
+          bet += betDenominations[betIndex];
         }
-        return new GameDecision("bet", _bet);
+        return new GameDecision("bet", bet);
       }
       else{
         if(this.get_handScore < 15){
