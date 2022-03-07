@@ -97,11 +97,24 @@ export class Controller{
     let okResults = document.querySelectorAll("#okResults")[0];
     
     okResults.addEventListener("click", function(){
-        roundResults.innerHTML = 
-            `
-            ${View.getNextGameButtonStirng(table)}
-            `
+      table.set_gamePhase = "stopOrContinue";
+      View.renderTablePage(table);
      })
+  }
+  
+  public static addStopOrContinueGame(table: Table): void{
+    let continueButton = document.querySelectorAll("#continueGameButton")[0];
+    let stopButton = document.querySelectorAll("#stopGameButton")[0];
+
+    continueButton.addEventListener("click", function(){
+      table.nextGame();
+      View.renderTablePage(table);
+    })
+
+    stopButton.addEventListener("click", function(){
+        View.renderLandingPage();
+    })
+
   }
 
   public static totalBets(): number{

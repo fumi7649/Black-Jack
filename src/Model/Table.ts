@@ -54,6 +54,12 @@ export class Table {
   }
 
   
+  public set set_turnCounter(n : number) {
+    this._turnCounter = n;
+  }
+  
+
+  
   public set increase_roundCounter(n : number) {
     this._roundConuter += n;
   }
@@ -124,25 +130,29 @@ export class Table {
     for (let i = 0; i < this._players.length; i++) {
       let currentPlayer: Player = this._players[i];
       if (currentPlayer.get_gameStatus === "bust" || currentPlayer.get_gameStatus === "surrender") {
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|\n`;
+        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|`;
       }
       else if (this._house.get_gameStatus === "blackjack" && currentPlayer.get_gameStatus === "blackjack") {
         s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|\n`;
       }
       else if (currentPlayer.get_gameStatus === "blackjack") {
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount * 1.5}|\n`;
+        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount * 1.5}|`;
       }
       else if(this._house.get_gameStatus === "bust" && !(currentPlayer.get_gameStatus === "surrender" || currentPlayer.get_gameStatus === "bust")){
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|\n`;
+        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|`;
       }
       else {
         if (this._house.get_handScore < currentPlayer.get_handScore) {
-          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|\n`;
+          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|`;
+        }
+        else if(this._house.get_handScore === currentPlayer.get_handScore){
+          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|`;
         }
         else {
-          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|\n`;
+          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|`;
         }
       }
+      s += "\n";
     }
     this._resultLog.push(s);
   }
@@ -205,7 +215,9 @@ export class Table {
       if(this.playerActionsResolved(this._house))this.set_gamePhase = "roundOver";
     }
     if(this._gamePhase === "roundOver"){
-      this.blackjackEvaluateAndGetRoundResults();
+      if(this.get_resultLog[this._roundConuter] === undefined){
+        this.blackjackEvaluateAndGetRoundResults();
+      }
       if(this._players[0].get_chips < 0)this._players[0].set_gameStatus = "broke";
     }
     this.increase_turnCounter = 1;
@@ -244,6 +256,15 @@ export class Table {
       }
     }
     return true;
+  }
+
+  public nextGame(): void{
+    this.set_gamePhase = "betting";
+    this.set_turnCounter = 0;
+    this._house.set_gameStatus = "betting";
+    for(let i = 0; i < this._players.length;i++){
+      this._players[i].set_gameStatus = "betting";
+    }
   }
 
 }

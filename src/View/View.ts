@@ -82,6 +82,10 @@ export class View {
                     View.target.innerHTML += View.getResultLogString(table);
                     Controller.addOKEvent(table);
                 }
+                else if(table.get_gamePhase === "stopOrContinue"){
+                    View.target.innerHTML += View.getNextGameButtonStirng(table);
+                    Controller.addStopOrContinueGame(table);
+                }
             }
             else {
                 setTimeout(function () {
@@ -323,8 +327,8 @@ export class View {
                         <div class="card-body">
                             <h5 class="card-title">Do you want to continue the game?</h5>
                             <div class="d-flex justify-content-around p-2">
-                                <button id="stopGame" class="btn btn-danger">Stop Game</button>
-                                <button id="nextGameButton" class="btn btn-primary">Next Game</button>
+                                <button id="stopGameButton" class="btn btn-danger">Stop Game</button>
+                                <button id="continueGameButton" class="btn btn-primary">Continue Game</button>
                             </div>
                         </div>
                     </div>
