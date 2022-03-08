@@ -14,6 +14,8 @@ export class Controller{
     let inputName = document.querySelectorAll("#inputName")[0] as HTMLInputElement;
     let selectGameType = document.querySelectorAll("#selectGameType")[0] as HTMLSelectElement;
     let startGame = document.querySelectorAll("#startGame")[0];
+    let loginGame = document.querySelectorAll("#loginGame")[0];
+
     startGame.addEventListener("click", function(){
 
        if(inputName.value === ""){
@@ -36,6 +38,38 @@ export class Controller{
         }
         View.renderTablePage(table);
        }
+    })
+
+    loginGame.addEventListener("click", function(){
+      let user: Player;
+      if(inputName.value === ""){
+        alert("名前を入力してください");
+      }
+      else{
+        let saveChips: string | number | null = localStorage.getItem(inputName.value);
+
+        if(saveChips === null){
+          alert("データはありません。");
+          return;
+        }
+        else{
+          
+         
+          saveChips = parseInt(saveChips);
+          user = new Player(inputName.value, "user", selectGameType.value, saveChips);
+        }
+        let table: Table = new Table(selectGameType.value);
+        
+        table.set_player = user;
+        if(selectGameType.value === "blackjack"){
+          let bot1: Player = new Player("ai1", "ai", "blackjack");
+          let bot2: Player = new Player("ai2", "ai", "blackjack");
+          table.set_player = bot1;
+          table.set_player = bot2;
+        }
+        View.renderTablePage(table);
+
+      }
     })
   }
 
@@ -112,10 +146,17 @@ export class Controller{
     })
 
     stopButton.addEventListener("click", function(){
-        View.renderLandingPage();
-    })
+      let userName = table.get_players[0].get_name;
+      let userChips = String(table.get_players[0].get_chips);
 
+      localStorage.setItem(userName, userChips);
+      alert("Saved your data, Please put the same when you login.");
+      
+      View.renderLandingPage();
+    })
   }
+
+
 
   public static totalBets(): number{
     let totalBets:number = 0;

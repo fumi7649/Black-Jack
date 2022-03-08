@@ -71,6 +71,12 @@ export class Player{
     public set set_gameStatus(status : string) {
       this._gameStatus = status;
     }
+
+    
+    public set set_chips(n : number) {
+      this._chips += n;
+    }
+    
     
     
 
