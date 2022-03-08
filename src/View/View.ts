@@ -25,7 +25,7 @@ export class View {
                         </select>
                                             
                             <button class="btn btn-success form-control my-2" id="startGame">Start New Game</button>
-                            <button class="btn btn-outline-primary form-control my-2" id="loginGame">Login</button>
+                            <button class="btn btn-outline-success form-control my-2" id="loginGame">Login</button>
                     </div>
                 </div>
             </div>

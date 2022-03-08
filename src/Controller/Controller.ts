@@ -6,10 +6,6 @@ import { View } from "../View/View";
 export class Controller{
 
 
-  constructor(){
-    View.renderLandingPage();
-  }
-
   public static startGame(): void{
     View.renderLandingPage();
     let inputName = document.querySelectorAll("#inputName")[0] as HTMLInputElement;
@@ -155,7 +151,14 @@ export class Controller{
     })
   }
 
+  public static addRuluAndLogCheckEvent(): void{
+    let ruluButton = document.querySelectorAll("#ruleButton")[0];
+    let gameLogButton = document.querySelectorAll("#gameLogButton")[0];
 
+    ruluButton.addEventListener("click", function(){
+      
+    })
+  }
 
   public static totalBets(): number{
     let totalBets:number = 0;
