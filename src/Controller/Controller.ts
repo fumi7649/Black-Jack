@@ -10,7 +10,8 @@ export class Controller{
     View.renderLandingPage();
   }
 
-  public startGame(): void{
+  public static startGame(): void{
+    View.renderLandingPage();
     let inputName = document.querySelectorAll("#inputName")[0] as HTMLInputElement;
     let selectGameType = document.querySelectorAll("#selectGameType")[0] as HTMLSelectElement;
     let startGame = document.querySelectorAll("#startGame")[0];
@@ -47,14 +48,11 @@ export class Controller{
       }
       else{
         let saveChips: string | number | null = localStorage.getItem(inputName.value);
-
         if(saveChips === null){
           alert("データはありません。");
           return;
         }
         else{
-          
-         
           saveChips = parseInt(saveChips);
           user = new Player(inputName.value, "user", selectGameType.value, saveChips);
         }
@@ -115,11 +113,14 @@ export class Controller{
   }
 
   public static addActionEvent(table: Table): void{
-     let actionButton = document.querySelectorAll(".actionButton") as NodeListOf<HTMLButtonElement>;
-
+      let actionButton = document.querySelectorAll(".actionButton") as NodeListOf<HTMLButtonElement>;
+      let doubleButton = document.querySelectorAll("#double")[0] as HTMLButtonElement;
+      if(table.get_players[0].get_hand.length !== 2){
+        doubleButton.disabled = true;
+      }
+      
      for(let i = 0;i < actionButton.length;i++){
        actionButton[i].addEventListener("click", function(){
-         console.log(table.turnPlayer);
          table.haveTurn(actionButton[i].value);
          View.renderTablePage(table);
        })
@@ -127,7 +128,6 @@ export class Controller{
   }
 
   public static addOKEvent(table: Table): void{
-    let roundResults = document.querySelectorAll("#roundResults")[0];
     let okResults = document.querySelectorAll("#okResults")[0];
     
     okResults.addEventListener("click", function(){
@@ -151,8 +151,7 @@ export class Controller{
 
       localStorage.setItem(userName, userChips);
       alert("Saved your data, Please put the same when you login.");
-      
-      View.renderLandingPage();
+      Controller.startGame();
     })
   }
 
