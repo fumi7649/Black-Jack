@@ -93,6 +93,7 @@ export class Table {
 
 
   public evaluateMove(player: Player, userData: string | number | null): void {
+    if(player.get_gameStatus === "bust")return;
     let gameDecision: GameDecision = player.promptPlayer(userData);
 
     if (gameDecision.get_action === "bet") {
@@ -196,9 +197,6 @@ export class Table {
 
   public haveTurn(userData: string | number | null) {
     let currentPlayer: Player = this.turnPlayer;
-    console.log("turnCount:" + this._turnCounter);
-    console.log("turnPlayer:" + this.turnPlayer.get_name);
-    console.log(this._gamePhase);
 
     if (this._gamePhase === "betting") {
       if(this.onFirstPlayer()){
@@ -213,7 +211,7 @@ export class Table {
         return;
       }
     }
-    if (this._gamePhase === "acting") {
+    if (this._gamePhase === "acting"){
       this.evaluateMove(currentPlayer, userData);
       if(this.allPlayerActionsResolved())this.set_gamePhase = "evaluateWinners";
     }

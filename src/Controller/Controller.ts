@@ -113,11 +113,14 @@ export class Controller{
   }
 
   public static addActionEvent(table: Table): void{
-     let actionButton = document.querySelectorAll(".actionButton") as NodeListOf<HTMLButtonElement>;
-
+      let actionButton = document.querySelectorAll(".actionButton") as NodeListOf<HTMLButtonElement>;
+      let doubleButton = document.querySelectorAll("#double")[0] as HTMLButtonElement;
+      if(table.get_players[0].get_hand.length !== 2){
+        doubleButton.disabled = true;
+      }
+      
      for(let i = 0;i < actionButton.length;i++){
        actionButton[i].addEventListener("click", function(){
-         console.log(table.turnPlayer);
          table.haveTurn(actionButton[i].value);
          View.renderTablePage(table);
        })

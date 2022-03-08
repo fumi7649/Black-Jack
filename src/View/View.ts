@@ -263,7 +263,7 @@ export class View {
                     <button class="col-2 col-lg-1 btn btn-light mx-1 actionButton" value ="surrender">Surrender</button>
                     <button class="col-2 col-lg-1 btn btn-success mx-1 actionButton" value="stand">Stand</button>
                     <button class="col-2 col-lg-1 btn btn-warning mx-1 actionButton" value="hit">Hit</button>
-                    <button class="col-2 col-lg-1 btn btn-danger mx-1 actionButton" value="double">Double</button>
+                    <button id="double" class="col-2 col-lg-1 btn btn-danger mx-1 actionButton " value="double">Double</button>
                 </div>
             </div>
             `
