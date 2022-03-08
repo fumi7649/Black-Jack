@@ -23,7 +23,9 @@ export class View {
                             <option value="blackjack">Blackjack</option>
                             <option value="porker">Poker</option>
                         </select>
-                        <button class="btn btn-success form-control my-2" id="startGame">Start Game</button>
+                                            
+                            <button class="btn btn-success form-control my-2" id="startGame">Start New Game</button>
+                            <button class="btn btn-outline-primary form-control my-2" id="loginGame">Login</button>
                     </div>
                 </div>
             </div>
@@ -307,13 +309,13 @@ export class View {
         if (table.get_players[0].get_gameStatus === "broke") {
             nextButton =
                 `
-                <div class="d-flex justify-content-center align-items-center">
-                    <div class="card">
+                <div class="position-absolute top-50 start-50 translate-middle-x w-50">
+                    <div class="card text-center">
                         <div class="card-body">
                             <h5 class="card-title text-center">Game Over</h5>
                             <div class="p-2">
-                                <button id="stopGame" class="btn btn-danger">Stop Game</button>
-                                <button id="nextGameButton" class="btn btn-success">New Game</button>
+                                <button id="stopGame" class="btn btn-danger mx-3">Stop Game</button>
+                                <button id="nextGameButton" class="btn btn-success mx-3">New Game</button>
                             </div>
                         </div>
                     </div>
@@ -322,10 +324,10 @@ export class View {
         }else{
             nextButton =
                 `
-                <div class="d-flex justify-content-center align-items-center">
-                    <div class="card">
+                <div class="position-absolute top-50 start-50 translate-middle-x w-50">
+                    <div class="card text-center">
                         <div class="card-body">
-                            <h5 class="card-title">Do you want to continue the game?</h5>
+                            <h5 class="card-title">Are you continue?</h5>
                             <div class="d-flex justify-content-around p-2">
                                 <button id="stopGameButton" class="btn btn-danger">Stop Game</button>
                                 <button id="continueGameButton" class="btn btn-primary">Continue Game</button>
