@@ -39,7 +39,5 @@ let player3: Player = new Player("ai2", "ai", "blackjack");
 
 
 
-let controller: Controller = new Controller();
-
-controller.startGame();
+Controller.startGame();
 

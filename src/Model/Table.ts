@@ -140,14 +140,16 @@ export class Table {
         s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount * 1.5}|`;
         currentPlayer.set_chips = currentPlayer.get_winAmount * 1.5;
       }
-      else if(this._house.get_gameStatus === "bust" && !(currentPlayer.get_gameStatus === "surrender" || currentPlayer.get_gameStatus === "bust")){
+      else if(this._house.get_gameStatus === "bust" && (currentPlayer.get_gameStatus === "surrender" || currentPlayer.get_gameStatus === "bust")){
+        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|`;
+      }
+      else if(this._house.get_gameStatus === "bust"){
         s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|`;
-        currentPlayer.set_chips = currentPlayer.get_winAmount;
       }
       else {
         if (this._house.get_handScore < currentPlayer.get_handScore) {
           s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|`;
-          currentPlayer.set_chips = -currentPlayer.get_winAmount;
+          currentPlayer.set_chips = currentPlayer.get_winAmount;
         }
         else if(this._house.get_handScore === currentPlayer.get_handScore){
           s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|`;
