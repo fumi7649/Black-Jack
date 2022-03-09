@@ -6,8 +6,15 @@ import { Table } from "../Model/Table";
 export class View {
     private static target = document.getElementById("target");
 
-    constructor() {
 
+    public static displayNone(page: Element): void{
+        page.classList.remove("d-block");
+        page.classList.add("d-none");
+    }
+
+    public static displayBlock(page: Element): void{
+        page.classList.remove("d-none");
+        page.classList.add("d-block");
     }
 
     public static renderLandingPage(): void {
@@ -34,15 +41,16 @@ export class View {
     }
 
     public static renderTablePage(table: Table): void {
-
         if (View.target != null) {
             let botsString: string = ``;
             View.target.innerHTML = "";
             for (let i = 1; i < table.get_players.length; i++) {
                 botsString += View.getPlayerString(table.get_players[i]);
             }
-
-            View.target.innerHTML =
+            View.target.innerHTML += View.getMenuBarString();
+            View.target.innerHTML += View.getResultLogString(table);
+            
+            View.target.innerHTML +=
                 `
                 <div class="col-12">
                 <!-- house -->
@@ -81,8 +89,10 @@ export class View {
                     View.renderTablePage(table);
                 }
                 else if (table.get_gamePhase === "roundOver") {
-                    View.target.innerHTML += View.getResultLogString(table);
-                    Controller.addOKEvent(table);
+                    table.increase_roundCounter = 1;
+                    let roundResults = document.querySelectorAll("#roundResults")[0];
+                    View.displayBlock(roundResults);
+                    Controller.addCloseResultEvent(table);
                 }
                 else if(table.get_gamePhase === "stopOrContinue"){
                     View.target.innerHTML += View.getNextGameButtonStirng(table);
@@ -95,6 +105,8 @@ export class View {
                     View.renderTablePage(table);
                 }, 1000);
             }
+            Controller.addRuluAndLogCheckEvent();
+            Controller.addCloseResultEvent(table);
         }
     }
 
@@ -103,9 +115,9 @@ export class View {
         if (card === undefined) {
             cardString +=
                 `
-            <div class="bg-white p-1 mx-2">
+            <div class="bg-white p-1 mx-1">
                       <div class="text-center">
-                          <img src="./assets/img/questionMark.png" alt="" width="50" height="50">
+                          <img src="./assets/img/questionMark.png" alt="" width="45" height="45">
                       </div>
                       <div class="text-center">
                           <p class="m-0">?</p>
@@ -115,9 +127,9 @@ export class View {
         } else {
             cardString +=
                 `
-                <div class="bg-white p-2 mx-2">
+                <div class="bg-white p-1 mx-1">
                           <div class="text-center">
-                              <img src="./assets/img/${card.suit}.png" alt="" width="50" height="50">
+                              <img src="./assets/img/${card.suit}.png" alt="" width="45" height="45">
                           </div>
                           <div class="text-center">
                               <p class="m-0">${card.rank}</p>
@@ -127,6 +139,31 @@ export class View {
         }
 
         return cardString;
+    }
+
+    public static getMenuBarString(): string{
+        let menuBar: string =
+                `
+                <nav class="navbar navbar-expand-md navbar-light bg-green p-0">
+                    <div class="containuer-fluid">
+                        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#menuBar" aria-controls="menuBar" aria-expanded="false">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="menuBar">
+                        <ul class="navbar-nav me-auto ms-2">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" id="ruluButton">Rule</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" id="gameLogButton">GameLog</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                `;
+
+                return menuBar;
     }
 
     public static getPlayerString(player: Player): string {
@@ -140,7 +177,7 @@ export class View {
                 `
             <div class="playerStatus">
                   <div class="">
-                      <h6 class="text-center text-white pt-2">${player.get_name}</h6>
+                      <h6 class="text-center text-white">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -211,7 +248,7 @@ export class View {
 
         bet +=
             `
-            <div id="betDivs" class="d-flex justify-content-around w-50 my-2 m-auto">
+            <div id="betDivs" class="d-flex justify-content-around my-2 w-75 m-auto">
                 <div>
                     <p class="text-white text-center">5</p>
                     <div class="input-group">
@@ -244,10 +281,13 @@ export class View {
                         <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
+                <div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <button id="submitBetsButton" class="btn btn-success">Submit your bet</button>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-center p-1">
-                <button id="submitBetsButton" class="btn btn-success">Submit your bet</button>
-            </div>
+            
             `
 
         return bet;
@@ -259,7 +299,7 @@ export class View {
         actionString +=
             `
             <div id="playerAction">
-                <div class="d-flex justify-content-center p-2 py-5">
+                <div class="d-flex justify-content-center p-2">
                     <button class="col-2 col-lg-1 btn btn-light mx-1 actionButton" value ="surrender">Surrender</button>
                     <button class="col-2 col-lg-1 btn btn-success mx-1 actionButton" value="stand">Stand</button>
                     <button class="col-2 col-lg-1 btn btn-warning mx-1 actionButton" value="hit">Hit</button>
@@ -272,35 +312,37 @@ export class View {
 
     public static getResultLogString(table: Table): string {
         let resultList: string = "";
-        for (let i = 0;i < table.get_resultLog.length; i++) {
-            resultList +=
-                `
-                <li class="list-group-item">
-                    ${table.get_resultLog[i]}
-                </li>
-                `
+        if(table.get_resultLog.length === 0){
+            resultList = "No result";
+        }else{
+            for (let i = 0;i < table.get_resultLog.length; i++) {
+                resultList +=
+                    `
+                    <li class="list-group-item">
+                        ${table.get_resultLog[i]}
+                    </li>
+                    `
+            }
         }
-
         let result: string =
-            `
-            <div id="roundResults" class="position-absolute top-50 start-50 translate-middle-x w-50">
-                <div class="card text-center max-">
-                    <div class="card-header">
-                    round ${table.get_roundCounter + 1}
-                    </div>
-                    <div class="card-body">
-                        <div class="overflow-auto" style="max-height: 150px;">
-                            <ul class="list-group list-group-flush">
-                                ${resultList}
-                            </ul>                        
+                `
+                <div id="roundResults" class="position-absolute top-50 start-50 translate-middle-x w-50 d-none">
+                    <div class="card text-center max-">
+                        <div class="card-header">
+                        round ${table.get_roundCounter + 1}
                         </div>
-                        <a id="okResults" class="card-link">OK</a>
+                        <div class="card-body">
+                            <div class="overflow-auto" style="max-height: 150px;">
+                                <ul class="list-group list-group-flush">
+                                    ${resultList}
+                                </ul>                        
+                            </div>
+                            <a id="closeResults" class="card-link">close</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-
-        table.increase_roundCounter = 1;
+            `;
+        
         return result;
     }
 

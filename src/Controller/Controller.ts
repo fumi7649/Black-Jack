@@ -62,7 +62,6 @@ export class Controller{
           table.set_player = bot2;
         }
         View.renderTablePage(table);
-
       }
     })
   }
@@ -123,19 +122,24 @@ export class Controller{
      }
   }
 
-  public static addOKEvent(table: Table): void{
-    let okResults = document.querySelectorAll("#okResults")[0];
-    
-    okResults.addEventListener("click", function(){
-      table.set_gamePhase = "stopOrContinue";
-      View.renderTablePage(table);
+  public static addCloseResultEvent(table: Table): void{
+    let closeResults = document.querySelectorAll("#closeResults")[0];
+    let roundResults = document.querySelectorAll("#roundResults")[0];
+
+    closeResults.addEventListener("click", function(){
+      if(table.get_gamePhase === "roundOver"){
+        table.set_gamePhase = "stopOrContinue";
+        View.renderTablePage(table);
+      }
+      else{
+        View.displayNone(roundResults);
+      }
      })
   }
   
   public static addStopOrContinueGame(table: Table): void{
     let continueButton = document.querySelectorAll("#continueGameButton")[0];
     let stopButton = document.querySelectorAll("#stopGameButton")[0];
-
     continueButton.addEventListener("click", function(){
       table.nextGame();
       View.renderTablePage(table);
@@ -153,11 +157,18 @@ export class Controller{
 
   public static addRuluAndLogCheckEvent(): void{
     let ruluButton = document.querySelectorAll("#ruleButton")[0];
-    let gameLogButton = document.querySelectorAll("#gameLogButton")[0];
-
-    ruluButton.addEventListener("click", function(){
+    let gameLogButton = document.querySelectorAll("#gameLogButton")[0] as HTMLButtonElement;
+    let resultLog = document.querySelectorAll("#roundResults")[0];
+    // ruluButton.addEventListener("click", function(){
       
+    // });
+    console.log(gameLogButton);
+
+    gameLogButton.addEventListener("click", function(){
+      View.displayBlock(resultLog);
     })
+    
+    
   }
 
   public static totalBets(): number{
