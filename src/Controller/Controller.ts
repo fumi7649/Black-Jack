@@ -102,8 +102,13 @@ export class Controller {
     let submitBetsButton = document.querySelectorAll("#submitBetsButton")[0];
     submitBetsButton.addEventListener("click", function () {
       let totalBets: number = Controller.totalBets();
-      table.haveTurn(totalBets);
-      View.renderTablePage(table);
+      if(totalBets === 0){
+        alert("Chipを賭けてください")
+      }
+      else{
+        table.haveTurn(totalBets);
+        View.renderTablePage(table);
+      }
     })
   }
 
