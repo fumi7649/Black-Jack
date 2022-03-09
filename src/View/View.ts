@@ -6,8 +6,15 @@ import { Table } from "../Model/Table";
 export class View {
     private static target = document.getElementById("target");
 
-    constructor() {
 
+    public static displayNone(page: Element): void {
+        page.classList.remove("d-block");
+        page.classList.add("d-none");
+    }
+
+    public static displayBlock(page: Element): void {
+        page.classList.remove("d-none");
+        page.classList.add("d-block");
     }
 
     public static renderLandingPage(): void {
@@ -25,7 +32,7 @@ export class View {
                         </select>
                                             
                             <button class="btn btn-success form-control my-2" id="startGame">Start New Game</button>
-                            <button class="btn btn-outline-primary form-control my-2" id="loginGame">Login</button>
+                            <button class="btn btn-outline-success form-control my-2" id="loginGame">Login</button>
                     </div>
                 </div>
             </div>
@@ -34,15 +41,17 @@ export class View {
     }
 
     public static renderTablePage(table: Table): void {
-
         if (View.target != null) {
             let botsString: string = ``;
             View.target.innerHTML = "";
             for (let i = 1; i < table.get_players.length; i++) {
                 botsString += View.getPlayerString(table.get_players[i]);
             }
+            View.target.innerHTML += View.getMenuBarString();
+            View.target.innerHTML += View.getBlackJackRuluString();
+            View.target.innerHTML += View.getResultLogString(table);
 
-            View.target.innerHTML =
+            View.target.innerHTML +=
                 `
                 <div class="col-12">
                 <!-- house -->
@@ -67,9 +76,9 @@ export class View {
                     Controller.addBetSubmitEvent(table);
                 }
                 else if (table.get_gamePhase === "acting") {
-                    if (table.playerActionsResolved(table.turnPlayer)){
-                       table.haveTurn(null);
-                       View.renderTablePage(table);
+                    if (table.playerActionsResolved(table.turnPlayer)) {
+                        table.haveTurn(null);
+                        View.renderTablePage(table);
                     }
                     else {
                         View.target.innerHTML += View.getActionString();
@@ -81,10 +90,12 @@ export class View {
                     View.renderTablePage(table);
                 }
                 else if (table.get_gamePhase === "roundOver") {
-                    View.target.innerHTML += View.getResultLogString(table);
-                    Controller.addOKEvent(table);
+                    table.increase_roundCounter = 1;
+                    let roundResults = document.querySelectorAll("#roundResults")[0];
+                    View.displayBlock(roundResults);
+                    Controller.addCloseResultOrRuleEvent(table);
                 }
-                else if(table.get_gamePhase === "stopOrContinue"){
+                else if (table.get_gamePhase === "stopOrContinue") {
                     View.target.innerHTML += View.getNextGameButtonStirng(table);
                     Controller.addStopOrContinueGame(table);
                 }
@@ -95,6 +106,8 @@ export class View {
                     View.renderTablePage(table);
                 }, 1000);
             }
+            Controller.addRuluAndLogCheckEvent();
+            Controller.addCloseResultOrRuleEvent(table);
         }
     }
 
@@ -103,9 +116,9 @@ export class View {
         if (card === undefined) {
             cardString +=
                 `
-            <div class="bg-white p-1 mx-2">
+                <div class="bg-white p-1 mx-1">
                       <div class="text-center">
-                          <img src="./assets/img/questionMark.png" alt="" width="50" height="50">
+                          <img src="./assets/img/questionMark.png" alt="" width="45" height="45">
                       </div>
                       <div class="text-center">
                           <p class="m-0">?</p>
@@ -115,9 +128,9 @@ export class View {
         } else {
             cardString +=
                 `
-                <div class="bg-white p-2 mx-2">
+                    <div class="bg-white p-1 mx-1">
                           <div class="text-center">
-                              <img src="./assets/img/${card.suit}.png" alt="" width="50" height="50">
+                              <img src="./assets/img/${card.suit}.png" alt="" width="45" height="45">
                           </div>
                           <div class="text-center">
                               <p class="m-0">${card.rank}</p>
@@ -127,6 +140,31 @@ export class View {
         }
 
         return cardString;
+    }
+
+    public static getMenuBarString(): string {
+        let menuBar: string =
+            `
+                <nav class="navbar navbar-expand-md navbar-light bg-green p-0">
+                    <div class="containuer-fluid">
+                        <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#menuBar" aria-controls="menuBar" aria-expanded="false">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="menuBar">
+                        <ul class="navbar-nav me-auto ms-2">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" id="ruleButton">Rule</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" id="gameLogButton">GameLog</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                `;
+
+        return menuBar;
     }
 
     public static getPlayerString(player: Player): string {
@@ -140,7 +178,7 @@ export class View {
                 `
             <div class="playerStatus">
                   <div class="">
-                      <h6 class="text-center text-white pt-2">${player.get_name}</h6>
+                      <h6 class="text-center text-white">${player.get_name}</h6>
                   </div>
                   <div id="player1Infomation" class="d-flex justify-content-around text-white ">
                       <p>S: ${player.get_gameStatus}</p>
@@ -211,7 +249,7 @@ export class View {
 
         bet +=
             `
-            <div id="betDivs" class="d-flex justify-content-around w-50 my-2 m-auto">
+            <div id="betDivs" class="d-flex justify-content-around my-2 w-75 m-auto">
                 <div>
                     <p class="text-white text-center">5</p>
                     <div class="input-group">
@@ -244,10 +282,13 @@ export class View {
                         <button class="btn btn-success increaseBets">+</button>
                     </div>
                 </div>
+                <div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <button id="submitBetsButton" class="btn btn-success">Submit your bet</button>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-center p-1">
-                <button id="submitBetsButton" class="btn btn-success">Submit your bet</button>
-            </div>
+            
             `
 
         return bet;
@@ -259,7 +300,7 @@ export class View {
         actionString +=
             `
             <div id="playerAction">
-                <div class="d-flex justify-content-center p-2 py-5">
+                <div class="d-flex justify-content-center p-2">
                     <button class="col-2 col-lg-1 btn btn-light mx-1 actionButton" value ="surrender">Surrender</button>
                     <button class="col-2 col-lg-1 btn btn-success mx-1 actionButton" value="stand">Stand</button>
                     <button class="col-2 col-lg-1 btn btn-warning mx-1 actionButton" value="hit">Hit</button>
@@ -272,36 +313,158 @@ export class View {
 
     public static getResultLogString(table: Table): string {
         let resultList: string = "";
-        for (let i = 0;i < table.get_resultLog.length; i++) {
-            resultList +=
-                `
-                <li class="list-group-item">
-                    ${table.get_resultLog[i]}
-                </li>
-                `
+        if (table.get_resultLog.length === 0) {
+            resultList = "No result";
+        } else {
+            for (let i = 0; i < table.get_resultLog.length; i++) {
+                resultList +=
+                    `
+                    <li class="list-group-item">
+                        <h5>Round ${i + 1}</h5>
+                        <p>${table.get_resultLog[i]}</p>
+                    </li>
+                    `
+            }
         }
-
         let result: string =
             `
-            <div id="roundResults" class="position-absolute top-50 start-50 translate-middle-x w-50">
-                <div class="card text-center max-">
-                    <div class="card-header">
-                    round ${table.get_roundCounter + 1}
-                    </div>
-                    <div class="card-body">
-                        <div class="overflow-auto" style="max-height: 150px;">
-                            <ul class="list-group list-group-flush">
-                                ${resultList}
-                            </ul>                        
+                <div id="roundResults" class="position-absolute top-50 start-50 translate-middle w-50 d-none">
+                    <div class="card text-center max-">
+                        <div class="card-header">Log</div>
+                        <div class="card-body">
+                            <div class="overflow-auto" style="max-height: 150px;">
+                                <ul class="list-group list-group-flush">
+                                    ${resultList}
+                                </ul>                        
+                            </div>
+                            <a id="closeResults" class="card-link">close</a>
                         </div>
-                        <a id="okResults" class="card-link">OK</a>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
 
-        table.increase_roundCounter = 1;
         return result;
+    }
+
+    public static getBlackJackRuluString(): string {
+        let gameRuluString: string = "";
+
+        gameRuluString =
+            `
+            <div id="gameRule" class="d-flex m-3 pe-3  col-11 position-absolute top-0 start-0 bg-secondary d-none" style="z-index: 10;">
+                <div class="col-2">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        <a class="list-group-item list-group-item-action active" id="list-overview-list"
+                            data-bs-toggle="list" href="#list-overview" role="tab" aria-controls="list-overview">ゲームの概要</a>
+                        <a class="list-group-item list-group-item-action" id="list-flow-list" data-bs-toggle="list"
+                            href="#list-flow" role="tab" aria-controls="list-flow">ゲームの流れ</a>
+                        <a class="list-group-item list-group-item-action" id="list-nubmerCount-list" data-bs-toggle="list"
+                            href="#list-nubmerCount" role="tab" aria-controls="list-nubmerCount">数の数え方</a>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="tab-content text-white f-90" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="list-overview" role="tabpanel"
+                            aria-labelledby="list-overview-list">
+                            <p class="p-2">
+                                Houseと一対一で勝負します。自分の持っているカードとHouseの持っているカードの合計値を比べて合計値の大きいほうが勝利となります。しかし、合計値が21を超えてはいけません。21を超えた時点でbust(負け)となってしまいます。
+                            </p>
+                        </div>
+                        <div class="tab-pane fade" id="list-flow" role="tabpanel" aria-labelledby="list-flow-list">
+                            <div class="p-2">
+                                <ol>
+                                    <li>
+                                        <h6>ベット</h6>
+                                        <p>ゲームが始まる前に1ゲームで賭ける金額を決めます。</p>
+                                    </li>
+                                    <li>
+                                        <h6>アクション</h6>
+                                        <p>各プレイヤーは与えられた手札でさまざまなアクションをとることができます。</p>
+                                        <ul>
+                                            <li class="text-info">Surrender</li>
+                                            <p class="py-1">最初に配られたカードを見て、その時点で自ら負けを認めること。サレンダーした場合かけた金額の半分がもどってきます。</p>
+                                            <li class="text-info">Stand</li>
+                                            <p class="py-1">今持っているカードで勝負することを宣言します。</p>
+                                            <li class="text-info">Hit</li>
+                                            <p class="py-1">現在の手札にさらに一枚追加します。手札の合計値が21をしまった時点でそのプレイヤーはbust(負け)となります。</p>
+                                            <li class="text-info">Double</li>
+                                            <p class="py-1">
+                                                ベットを2倍にして、もう一枚カードを追加します。手札の合計値が21をしまった時点でそのプレイヤーはbust(負け)となります。このアクションは最初にカードが配られた後にしか行うことができません。
+                                            </p>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <h6>評価</h6>
+                                        <p>すべてのプレイヤーがアクションを行えなくなった時点で、残ったプレイヤーとHouseの手札を比較し勝ち負けを判定します。評価に沿ってプレイヤーのチップを変動します。</p>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="list-nubmerCount" role="tabpanel"
+                            aria-labelledby="list-nubmerCount-list">
+                            
+                                <ul>
+                                    <li class="text-info">A</li>
+                                    <p class="py-1">Aは1または,11としてカウントします。プレイヤーの都合のいいほうで数えることができます。</p>
+                                    <li class="text-info">J, Q, K</li>
+                                    <p class="py-1">J,Q,Kはすべて10としてカウントします。</p>
+                                    <li class="text-info">それ以外(2～10)</li>
+                                    <p class="py-1">それ以外のカードはそのままの値でカウントします。</p>
+                                    <li class="text-info">A+10(J, Q, Kを含む)の組み合わせ場合</li>
+                                    <p>プレイヤーの手札が2枚でA+10(J, Q, Kを含む)だったときをblackjackと呼びます。これはほかのblackjack以外の手札を打ち負かすことができます。例えば(2,
+                                        9, K)のようにカードの合計値が同じであった場合でも勝利することができます。</p>
+                                </ul>
+                            <div>
+                                    <p>例.1</p>
+                                    <div class="d-flex">
+                                        <div class="bg-white col-1  m-1">
+                                            <div class="text-center">
+                                                <img src="./assets/img/heart.png" alt="" width="45" height="45">
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="m-0 text-dark">A</p>
+                                            </div>
+                                        </div>
+                                        <div class="bg-white col-1 m-1">
+                                            <div class="text-center">
+                                                <img src="./assets/img/diamond.png" alt="" width="45" height="45">
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="m-0 text-dark">8</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <p>11 + 8 = 19</p>
+                                <p>例.2</p>
+                                <div class="d-flex">
+                                    <div class="bg-white col-1  m-1">
+                                        <div class="text-center">
+                                            <img src="./assets/img/spade.png" alt="" width="45" height="45">
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="m-0 text-dark">A</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white col-1 m-1">
+                                        <div class="text-center">
+                                            <img src="./assets/img/clover.png" alt="" width="45" height="45">
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="m-0 text-dark">K</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p>blackjack</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a id="closeRule" type="button" class="ms-auto text-danger text-center">close</a>
+            </div>
+    
+    
+                `;
+        return gameRuluString;
     }
 
     public static getNextGameButtonStirng(table: Table): string {
@@ -321,7 +484,7 @@ export class View {
                     </div>
                 </div>
                 `
-        }else{
+        } else {
             nextButton =
                 `
                 <div class="position-absolute top-50 start-50 translate-middle-x w-50">
