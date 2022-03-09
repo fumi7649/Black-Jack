@@ -116,6 +116,7 @@ export class Controller {
 
     for (let i = 0; i < actionButton.length; i++) {
       actionButton[i].addEventListener("click", function () {
+        
         table.haveTurn(actionButton[i].value);
         View.renderTablePage(table);
       })
@@ -143,12 +144,14 @@ export class Controller {
     })
   }
 
-  public static addStopOrContinueGame(table: Table): void {
+  public static addStopOrContinueGameEvent(table: Table): void {
     let continueButton = document.querySelectorAll("#continueGameButton")[0];
     let stopButton = document.querySelectorAll("#stopGameButton")[0];
-    continueButton.addEventListener("click", function () {
-      table.nextGame();
-      View.renderTablePage(table);
+    
+
+    continueButton.addEventListener("click", function () { 
+        table.nextGame();
+        View.renderTablePage(table);
     })
 
     stopButton.addEventListener("click", function () {
@@ -158,6 +161,13 @@ export class Controller {
       localStorage.setItem(userName, userChips);
       alert("Saved your data, Please put the same when you login.");
       Controller.startGame();
+    })
+  }
+
+  public static addNewGameEvent(): void{
+    let newGameButton = document.querySelectorAll("#newGameButton")[0];
+    newGameButton.addEventListener("click", function(){
+      View.renderLandingPage();
     })
   }
 

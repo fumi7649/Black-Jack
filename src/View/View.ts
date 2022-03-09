@@ -97,7 +97,12 @@ export class View {
                 }
                 else if (table.get_gamePhase === "stopOrContinue") {
                     View.target.innerHTML += View.getNextGameButtonStirng(table);
-                    Controller.addStopOrContinueGame(table);
+                    if(table.get_players[0].get_gameStatus === "broke"){
+                        Controller.addNewGameEvent();
+                    }
+                    else{
+                        Controller.addStopOrContinueGameEvent(table);
+                    }
                 }
             }
             else {
@@ -477,8 +482,7 @@ export class View {
                         <div class="card-body">
                             <h5 class="card-title text-center">Game Over</h5>
                             <div class="p-2">
-                                <button id="stopGame" class="btn btn-danger mx-3">Stop Game</button>
-                                <button id="nextGameButton" class="btn btn-success mx-3">New Game</button>
+                                <button id="newGameButton" class="btn btn-success mx-3">New Game</button>
                             </div>
                         </div>
                     </div>
