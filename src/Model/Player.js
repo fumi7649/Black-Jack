@@ -1,10 +1,9 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
-var GameDecision_1 = require("./GameDecision");
-var Player = /** @class */ (function () {
-    function Player(_name, _type, _gameType, _chips) {
-        if (_chips === void 0) { _chips = 400; }
+const GameDecision_1 = require("./GameDecision");
+class Player {
+    constructor(_name, _type, _gameType, _chips = 400) {
         this._name = _name;
         this._type = _type;
         this._gameType = _gameType;
@@ -12,59 +11,40 @@ var Player = /** @class */ (function () {
         this._hand = [];
         this._bet = 0;
         this._winAmount = 0;
-        this._gameStatus = "betting";
+        this._gameStatus = this.type === "house" ? "WaitingForBets" : "betting";
     }
-    Object.defineProperty(Player.prototype, "get_name", {
-        get: function () {
-            return this._name;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "get_bet", {
-        get: function () {
-            return this._bet;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "get_winAmount", {
-        get: function () {
-            return this._winAmount;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "get_gameStatus", {
-        get: function () {
-            return this._gameStatus;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "set_bet", {
-        set: function (amount) {
-            this._bet = amount;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "set_winAmount", {
-        set: function (amount) {
-            this._winAmount = amount;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "set_gameStatus", {
-        set: function (status) {
-            this._gameStatus = status;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Player.prototype.promptPlayer = function (userData) {
-        if (this._type === "ai" || this._type === "house")
+    get get_name() {
+        return this._name;
+    }
+    get get_chips() {
+        return this._chips;
+    }
+    get get_bet() {
+        return this._bet;
+    }
+    get get_winAmount() {
+        return this._winAmount;
+    }
+    get get_gameStatus() {
+        return this._gameStatus;
+    }
+    get type() {
+        return this._type;
+    }
+    set set_bet(amount) {
+        this._bet = amount;
+    }
+    set set_winAmount(amount) {
+        this._winAmount = amount;
+    }
+    set set_gameStatus(status) {
+        this._gameStatus = status;
+    }
+    set set_chips(n) {
+        this._chips += n;
+    }
+    promptPlayer(userData) {
+        if (this._type === "ai" || this._type === "house" || userData === null)
             return this.get_aiDecision;
         if (this._gameStatus === "betting") {
             return new GameDecision_1.GameDecision("bet", userData);
@@ -72,73 +52,52 @@ var Player = /** @class */ (function () {
         else {
             return new GameDecision_1.GameDecision(userData, this._bet);
         }
-    };
-    Object.defineProperty(Player.prototype, "get_aiDecision", {
-        get: function () {
-            var betDenominations = [5, 20, 50, 100];
-            var betDenominationCount = Player.getRandomInteger(1, 4);
-            var betIndex = Player.getRandomInteger(0, 3);
-            var _bet = 0;
-            if (this._gameStatus === "betting") {
-                for (var i = betDenominationCount; i > 0; i--) {
-                    _bet += betDenominations[betIndex];
-                }
-                return new GameDecision_1.GameDecision("bet", _bet);
+    }
+    get get_aiDecision() {
+        const betDenominations = [5, 20, 50, 100];
+        let betDenominationCount = Player.getRandomInteger(1, 4);
+        let betIndex = Player.getRandomInteger(0, 3);
+        let bet = 0;
+        if (this._gameStatus === "betting") {
+            for (let i = betDenominationCount; i > 0; i--) {
+                bet += betDenominations[betIndex];
+            }
+            return new GameDecision_1.GameDecision("bet", bet);
+        }
+        else {
+            if (this.get_handScore < 15) {
+                return new GameDecision_1.GameDecision("hit", this._bet);
             }
             else {
-                if (this.get_handScore < 15) {
-                    return new GameDecision_1.GameDecision("hit", this._bet);
-                }
-                else {
-                    return new GameDecision_1.GameDecision("stand", this._bet);
-                }
+                return new GameDecision_1.GameDecision("stand", this._bet);
             }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "get_hand", {
-        get: function () {
-            return this._hand;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "push_card", {
-        set: function (card) {
-            this._hand.push(card);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "reset_card", {
-        set: function (cards) {
-            this._hand = cards;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Player.prototype, "get_handScore", {
-        get: function () {
-            var count = 0;
-            var aces = [];
-            for (var i = 0; i < this._hand.length; i++) {
-                count += this._hand[i].get_rankNumber;
-                if (this._hand[i].rank === "A")
-                    aces.push("A");
-            }
-            while (count > 21 && aces.length > 0) {
-                aces.pop();
-                count -= 10;
-            }
-            return count;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Player.getRandomInteger = function (min, max) {
+        }
+    }
+    get get_hand() {
+        return this._hand;
+    }
+    set push_card(card) {
+        this._hand.push(card);
+    }
+    set reset_card(cards) {
+        this._hand = cards;
+    }
+    get get_handScore() {
+        let count = 0;
+        let aces = [];
+        for (let i = 0; i < this._hand.length; i++) {
+            count += this._hand[i].get_rankNumber;
+            if (this._hand[i].rank === "A")
+                aces.push("A");
+        }
+        while (count > 21 && aces.length > 0) {
+            aces.pop();
+            count -= 10;
+        }
+        return count;
+    }
+    static getRandomInteger(min, max) {
         return Math.floor(Math.random() * (max + 1 - min)) + min;
-    };
-    return Player;
-}());
+    }
+}
 exports.Player = Player;
