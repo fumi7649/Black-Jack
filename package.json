@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode=development",
-    "start": "webpack serve --mode=development"
+    "start": "webpack serve --mode=development",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -17,8 +18,9 @@
   "bugs": {
     "url": "https://github.com/fumi7649/Black-Jack/issues"
   },
-  "homepage": "https://github.com/fumi7649/Black-Jack#readme",
+  "homepage": "https://github.com/fumi7649/Black-Jack/",
   "devDependencies": {
+    "gh-pages": "^3.2.3",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",
     "webpack": "^5.69.1",
