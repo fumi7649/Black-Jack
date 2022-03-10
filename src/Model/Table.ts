@@ -93,9 +93,8 @@ export class Table {
 
 
   public evaluateMove(player: Player, userData: string | number | null): void {
-    if(player.get_gameStatus === "bust")return;
+    if(player.get_gameStatus === "bust" || player.get_gameStatus === "surrender" || player.get_gameStatus === "stand" || player.get_gameStatus === "double")return;
     let gameDecision: GameDecision = player.promptPlayer(userData);
-
     if (gameDecision.get_action === "bet") {
       player.set_bet = gameDecision.get_amount;
       player.set_winAmount = gameDecision.get_amount;
@@ -116,6 +115,7 @@ export class Table {
       player.set_bet = player.get_bet * 2;
       player.set_winAmount = player.get_winAmount * 2;
       player.push_card = this._deck.drawOne();
+      player.set_gameStatus = "double";
       if(player.get_handScore > 21)player.set_gameStatus = "bust";
     }
     if (gameDecision.get_action === "surrender") {
@@ -123,6 +123,7 @@ export class Table {
       player.set_winAmount = Math.floor(player.get_winAmount / 2);
       player.set_gameStatus = "surrender";
     }
+    
   }
 
   public blackjackEvaluateAndGetRoundResults(): void {
@@ -131,36 +132,76 @@ export class Table {
     for (let i = 0; i < this._players.length; i++) {
       let currentPlayer: Player = this._players[i];
       if (currentPlayer.get_gameStatus === "bust" || currentPlayer.get_gameStatus === "surrender") {
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|`;
+        s +=
+         `
+          <div class="d-flex">
+            <p class="text-danger">Lose</p>
+            <p>|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|</p>
+          </div>
+        `;
         currentPlayer.set_chips = -currentPlayer.get_winAmount;
       }
-      else if (this._house.get_gameStatus === "blackjack" && currentPlayer.get_gameStatus === "blackjack") {
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|`;
+      else if ((this._house.get_gameStatus === "blackjack" && currentPlayer.get_gameStatus === "blackjack") || (this._house.get_gameStatus === "bust" && (currentPlayer.get_gameStatus === "surrender" || currentPlayer.get_gameStatus === "bust"))) {
+        s += 
+        `
+        <div class="d-flex">
+        <p>Draw</p> 
+          <p >|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|</p>
+        </div>
+        `;
       }
       else if (currentPlayer.get_gameStatus === "blackjack") {
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount * 1.5}|`;
+        s += 
+        `
+        <div class="d-flex">
+          <p class="text-info">BlackJack</p>
+          <p>
+          |name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount * 1.5}|
+          </p>
+        </div>
+        `;
         currentPlayer.set_chips = currentPlayer.get_winAmount * 1.5;
       }
-      else if(this._house.get_gameStatus === "bust" && (currentPlayer.get_gameStatus === "surrender" || currentPlayer.get_gameStatus === "bust")){
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|`;
-      }
       else if(this._house.get_gameStatus === "bust"){
-        s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|`;
+        s += 
+        `
+        <div class="d-flex">
+          <p class="text-success">Win</p>
+          <p>|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|</p>
+        </div>
+        `;
       }
       else {
         if (this._house.get_handScore < currentPlayer.get_handScore) {
-          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|`;
+          s += 
+          `
+          <div class="d-flex">
+            <p class="text-success">Win</p>
+            <p>|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: ${currentPlayer.get_winAmount}|</p>
+          </div>
+          `;
           currentPlayer.set_chips = currentPlayer.get_winAmount;
         }
         else if(this._house.get_handScore === currentPlayer.get_handScore){
-          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|`;
+          s += 
+          `
+          <div class="d-flex">
+          <p>Draw</p> 
+            <p >|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: 0|</p>
+          </div>
+          `;
         }
         else {
-          s += `|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|`;
-          currentPlayer.set_chips = -currentPlayer.get_winAmount;
+          s +=
+          `
+           <div class="d-flex">
+             <p class="text-danger">Lose</p>
+             <p>|name: ${currentPlayer.get_name}, action: ${currentPlayer.get_gameStatus}, bet: ${currentPlayer.get_bet}, won: -${currentPlayer.get_winAmount}|</p>
+           </div>
+         `;
+         currentPlayer.set_chips = -currentPlayer.get_winAmount;
         }
       }
-      s += "\n";
     }
     this._resultLog.push(s);
   }
@@ -266,6 +307,8 @@ export class Table {
   public nextGame(): void{
     this.set_gamePhase = "betting";
     this.set_turnCounter = 0;
+    this._deck = new Deck(this._gameType);
+    this._deck.shuffle();
     this._house.set_gameStatus = "betting";
     for(let i = 0; i < this._players.length;i++){
       this._players[i].set_gameStatus = "betting";
