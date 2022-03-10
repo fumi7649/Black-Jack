@@ -93,7 +93,7 @@ export class Table {
 
 
   public evaluateMove(player: Player, userData: string | number | null): void {
-    if(player.get_gameStatus === "bust")return;
+    if(player.get_gameStatus === "bust" || player.get_gameStatus === "surrender")return;
     let gameDecision: GameDecision = player.promptPlayer(userData);
 
     if (gameDecision.get_action === "bet") {

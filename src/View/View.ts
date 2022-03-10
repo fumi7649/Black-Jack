@@ -333,7 +333,7 @@ export class View {
         }
         let result: string =
             `
-                <div id="roundResults" class="position-absolute top-50 start-50 translate-middle w-50 d-none">
+                <div id="roundResults" class="position-absolute top-50 start-50 translate-middle w-50 d-none" style="z-index: 10;">
                     <div class="card text-center max-">
                         <div class="card-header">Log</div>
                         <div class="card-body">
@@ -422,7 +422,7 @@ export class View {
                             <div>
                                     <p>例.1</p>
                                     <div class="d-flex">
-                                        <div class="bg-white col-1  m-1">
+                                        <div class="bg-white m-1">
                                             <div class="text-center">
                                                 <img src="./assets/img/heart.png" alt="" width="45" height="45">
                                             </div>
@@ -430,7 +430,7 @@ export class View {
                                                 <p class="m-0 text-dark">A</p>
                                             </div>
                                         </div>
-                                        <div class="bg-white col-1 m-1">
+                                        <div class="bg-white m-1">
                                             <div class="text-center">
                                                 <img src="./assets/img/diamond.png" alt="" width="45" height="45">
                                             </div>
@@ -442,7 +442,7 @@ export class View {
                                 <p>11 + 8 = 19</p>
                                 <p>例.2</p>
                                 <div class="d-flex">
-                                    <div class="bg-white col-1  m-1">
+                                    <div class="bg-white m-1">
                                         <div class="text-center">
                                             <img src="./assets/img/spade.png" alt="" width="45" height="45">
                                         </div>
@@ -450,7 +450,7 @@ export class View {
                                             <p class="m-0 text-dark">A</p>
                                         </div>
                                     </div>
-                                    <div class="bg-white col-1 m-1">
+                                    <div class="bg-white m-1">
                                         <div class="text-center">
                                             <img src="./assets/img/clover.png" alt="" width="45" height="45">
                                         </div>
