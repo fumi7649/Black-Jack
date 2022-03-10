@@ -1,6 +1,6 @@
 # Black-Jack
 <h3>概要</h3>
-RecursionCS(https://recursionist.io)で作ったProjectです。
+RecursionCS( https://recursionist.io )で作ったProjectです。
 <h3>URL</h3>
 https://fumi7649.github.io/Black-Jack/
 
