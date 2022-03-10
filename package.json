@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/fumi7649/Black-Jack/issues"
   },
-  "homepage": "https://github.com/fumi7649/Black-Jack/",
+  "homepage": "https://github.com/fumi7649/Black-Jack#readme",
   "devDependencies": {
     "gh-pages": "^3.2.3",
     "ts-loader": "^9.2.6",
