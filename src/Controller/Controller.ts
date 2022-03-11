@@ -18,6 +18,9 @@ export class Controller {
       if (inputName.value === "") {
         alert("名前を入力してください");
       }
+      else if(selectGameType.value === "poker"){
+        alert("準備中");
+      }
       else {
         let table: Table = new Table(selectGameType.value);
         let user: Player;
