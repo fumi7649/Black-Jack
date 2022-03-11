@@ -28,7 +28,7 @@ export class View {
                         <input type="text" placeholder="name" class="form-control" id="inputName">
                         <select class="form-select" id="selectGameType">
                             <option value="blackjack">Blackjack</option>
-                            <option value="porker">Poker</option>
+                            <option value="poker">Poker</option>
                         </select>
                                             
                             <button class="btn btn-success form-control my-2" id="startGame">Start New Game</button>
