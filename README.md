@@ -1,6 +1,7 @@
 # Black-Jack
 <h3>概要</h3>
-RecursionCS( https://recursionist.io )で作ったProjectです。
+RecursionCS( https://recursionist.io )で作った課題作品です。
+作品の仕様自体は課題として与えられたものですが、コードは独力で書いています。
 <h3>URL</h3>
 https://fumi7649.github.io/Black-Jack/
 <h3>遊び方</h3>
